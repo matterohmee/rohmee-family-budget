@@ -112,11 +112,12 @@ function renderKPIs(st, key){
   const kpi = document.getElementById('kpiStrip')
   kpi.innerHTML = ''
   const mt = monthTotals(st, key)
-  const savings = real(st, st.income - mt.aTotal)
-  const rate = st.income>0 ? (st.income - mt.aTotal)/st.income : 0
+  const income = st.months[key].income || 0
+  const savings = real(st, income - mt.aTotal)
+  const rate = income>0 ? (income - mt.aTotal)/income : 0
   const budgetUsed = mt.bTotal>0 ? (mt.aTotal/mt.bTotal) : 0
   const ytd = st.order.filter(k => k.slice(0,4)===key.slice(0,4) && k<=key)
-  const ytdSav = ytd.map(mk => st.income - monthTotals(st,mk).aTotal).reduce((a,b)=>a+b,0)
+  const ytdSav = ytd.map(mk => (st.months[mk].income||0) - monthTotals(st,mk).aTotal).reduce((a,b)=>a+b,0)
   const items=[
     {lab:'Monthly Savings (real SEK)', val: fmt(savings)},
     {lab:'Savings Rate', val: (rate*100).toFixed(1)+' %'},

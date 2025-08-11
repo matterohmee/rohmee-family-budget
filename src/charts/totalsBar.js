@@ -5,11 +5,11 @@ const text=(x,y,t,anchor='start',fill='#cbd5e1',fs=12)=>{const el=ns('text');el.
 export function drawTotalsBar(state, key){
   const svg=document.getElementById('barSummary'); while(svg.firstChild) svg.removeChild(svg.firstChild)
   const W=760,H=320,padL=110,padR=20,padT=20,padB=40,innerW=W-padL-padR,innerH=H-padT-padB
-  const mt=monthTotals(state,key), rows=[
-    {lab:'Income',val:state.income,c:'#60a5fa'},
+  const mt=monthTotals(state,key), inc=state.months[key].income||0, rows=[
+    {lab:'Income',val:inc,c:'#60a5fa'},
     {lab:'Budget',val:mt.bTotal,c:'#3b82f6'},
     {lab:'Actual',val:mt.aTotal,c:'#10b981'},
-    {lab:'Savings',val:Math.max(0,state.income-mt.aTotal),c:'#34d399'}
+    {lab:'Savings',val:Math.max(0,inc-mt.aTotal),c:'#34d399'}
   ]
   const max=Math.max(...rows.map(r=>r.val),1), rw=innerH/rows.length*0.55
   rows.forEach((r,i)=>{

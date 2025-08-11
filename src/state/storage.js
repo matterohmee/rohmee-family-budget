@@ -2,7 +2,8 @@ import { MODEL, DEFAULT_ICONS, DEFAULT_TAGS } from './model.js'
 import { monthList, ensureMonth } from './utils.js'
 
 const STORAGE_KEY = 'rohmee_budget_live'
-const VERSION = 1
+const VERSION = 2
+const DEFAULT_INCOME = 108000
 
 export function loadState(){
   let raw = localStorage.getItem(STORAGE_KEY)
@@ -18,7 +19,7 @@ export function loadState(){
       return st
     }catch(e){ /* fallthrough to default */ }
   }
-  const st = { income:108000, target:250000, cpi:1.00, order:monthList(2025), months:{}, icons:DEFAULT_ICONS, tags:DEFAULT_TAGS, selected:null, version:VERSION }
+  const st = { defaultIncome:DEFAULT_INCOME, target:250000, cpi:1.00, order:monthList(2025), months:{}, icons:DEFAULT_ICONS, tags:DEFAULT_TAGS, selected:null, version:VERSION }
   st.order.forEach(k => ensureMonth(st,k))
   // seed first months with slight variance
   ;['2025-01','2025-02','2025-03','2025-04','2025-05','2025-06','2025-07'].forEach(k=>{
@@ -60,6 +61,15 @@ export function importJSON(file, cb){
 
 /* -------- migrations -------- */
 function migrate(st){
-  // future schema migrations go here
+  if(st.version < 2){
+    st.defaultIncome = st.income || DEFAULT_INCOME
+    delete st.income
+    if(st.order){
+      st.order.forEach(k=>{
+        const m = st.months[k]
+        if(m && m.income === undefined) m.income = st.defaultIncome
+      })
+    }
+  }
   st.version = VERSION
 }

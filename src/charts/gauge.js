@@ -7,7 +7,7 @@ export function drawGauge(state, key){
   const svg=document.getElementById('ytdGauge'); while(svg.firstChild) svg.removeChild(svg.firstChild)
   const cx=200, cy=150, r=120, th=26
   const year=key.slice(0,4), months=state.order.filter(k=>k.slice(0,4)===year && k<=key)
-  const ytdSav=months.map(mk=>Math.max(0, state.income - monthTotals(state,mk).aTotal)).reduce((a,b)=>a+b,0)
+  const ytdSav=months.map(mk=>Math.max(0, (state.months[mk].income||0) - monthTotals(state,mk).aTotal)).reduce((a,b)=>a+b,0)
   const target=state.target||0, pct=target>0? Math.min(1,ytdSav/target):0
 
   const base=ns('circle'); base.setAttribute('cx',cx); base.setAttribute('cy',cy); base.setAttribute('r',r); base.setAttribute('fill','none'); base.setAttribute('stroke','#243049'); base.setAttribute('stroke-width',th); base.setAttribute('stroke-linecap','round'); svg.appendChild(base)
