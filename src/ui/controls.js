@@ -1,8 +1,8 @@
-import { monthList } from '../state/utils.js'
 import { exportJSON, importJSON } from '../state/storage.js'
 
 export function renderControls(state, onChange){
   const c = document.getElementById('controls')
+  const current = state.order[state.order.length-1]
   c.innerHTML = `
     <div style="display:grid;gap:10px">
       <div>
@@ -11,7 +11,7 @@ export function renderControls(state, onChange){
       </div>
       <div>
         <label>Net Income (SEK)</label>
-        <input id="netIncome" type="number" step="500" value="${state.income}">
+        <input id="netIncome" type="number" step="500" value="${state.months[current].income || 0}">
       </div>
       <div>
         <label>Yearly Savings Target (SEK)</label>
@@ -32,10 +32,11 @@ export function renderControls(state, onChange){
   `
   const sel = c.querySelector('#monthSel')
   state.order.forEach(k=>{ const o=document.createElement('option'); o.value=k; o.textContent=k; sel.appendChild(o) })
-  sel.value = state.order[state.order.length-1]
+  sel.value = current
 
-  sel.addEventListener('change', onChange)
-  c.querySelector('#netIncome').addEventListener('input', e=>{ state.income=+e.target.value||0; onChange() })
+  const netInput = c.querySelector('#netIncome')
+  sel.addEventListener('change', e=>{ netInput.value = state.months[sel.value].income || 0; onChange() })
+  netInput.addEventListener('input', e=>{ state.months[sel.value].income = +e.target.value||0; onChange() })
   c.querySelector('#savTarget').addEventListener('input', e=>{ state.target=+e.target.value||0; onChange() })
   c.querySelector('#cpiFactor').addEventListener('input', e=>{ state.cpi=+e.target.value||1; onChange() })
 

@@ -8,13 +8,13 @@ export function drawGlidepath(state, key){
   const W=760,H=320,padL=60,padR=20,padT=20,padB=50,innerW=W-padL-padR,innerH=H-padT-padB
   const year=key.slice(0,4), months=state.order.filter(k=>k.slice(0,4)===year)
   const idx=state.order.indexOf(key), past=state.order.filter(k=>k.slice(0,4)===year && state.order.indexOf(k)<=idx)
-  const ytdSav=past.map(mk=>Math.max(0, state.income - monthTotals(state,mk).aTotal)).reduce((a,b)=>a+b,0)
+  const ytdSav=past.map(mk=>Math.max(0, (state.months[mk].income||0) - monthTotals(state,mk).aTotal)).reduce((a,b)=>a+b,0)
   const rem=12 - past.length, remaining=Math.max(0,(state.target||0)-ytdSav), req = rem>0? remaining/rem : 0
   const mTarget=(state.target||0)/12
   const series=[]
   months.forEach(mk=>{
     if(state.order.indexOf(mk)<=idx){
-      series.push({m:mk, v:Math.max(0, state.income - monthTotals(state,mk).aTotal), t:'a'})
+      series.push({m:mk, v:Math.max(0, (state.months[mk].income||0) - monthTotals(state,mk).aTotal), t:'a'})
     }else{
       series.push({m:mk, v:req, t:'r'})
     }
