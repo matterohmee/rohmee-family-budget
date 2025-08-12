@@ -4,6 +4,7 @@ import { loadState, saveState, exportJSON, importJSON } from './state/storage.js
 import { monthTotals, prevMonthKey, real } from './state/calc.js'
 import { renderControls } from './ui/controls.js'
 import { renderTable } from './ui/table.js'
+import { renderInsights, addInsightsStyles } from './ui/insights.js'
 import { drawGauge } from './charts/gauge.js'
 import { drawFixedVar } from './charts/fixedVar.js'
 import { drawGlidepath } from './charts/glidepath.js'
@@ -12,6 +13,7 @@ import { drawShareBars } from './charts/shareBars.js'
 import { drawBAvsParents } from './charts/baParents.js'
 import { drawHeatmap } from './charts/heatmap.js'
 import { drawBridge } from './charts/bridge.js'
+import { drawSpendingTrends } from './charts/spendingTrends.js'
 
 // App state (mutable)
 export let state = loadState()
@@ -46,6 +48,17 @@ app.innerHTML = `
         <svg id="barSummary" class="chart small" viewBox="0 0 760 320" aria-label="Summary bars"></svg>
       </div>
     </div>
+  </div>
+
+  <div class="panel">
+    <div id="insightsPanel" class="insights-panel"></div>
+  </div>
+
+  <div class="panel">
+    <div class="legend">
+      <span><i class="sw" style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);"></i>Monthly Spending Trends</span>
+    </div>
+    <svg id="spendingTrends" class="chart" viewBox="0 0 1200 400" aria-label="Spending trends"></svg>
   </div>
 
   <div class="panel">
@@ -90,8 +103,12 @@ app.innerHTML = `
 renderControls(state, onStateChange)
 renderKPIs(state, currentMonth())
 
+// ---------- Initialize insights styles ----------
+addInsightsStyles()
+
 // ---------- First render ----------
 drawAll()
+renderInsights(state, currentMonth())
 
 // ---------- Expose helpers for overrides ----------
 window.state = state
@@ -106,6 +123,7 @@ function onStateChange(){
   saveState(state)
   renderKPIs(state, currentMonth())
   drawAll()
+  renderInsights(state, currentMonth())
 }
 
 function renderKPIs(st, key){
@@ -138,6 +156,7 @@ function drawAll(){
   drawFixedVar(state, key)
   drawGlidepath(state, key)
   drawTotalsBar(state, key)
+  drawSpendingTrends(state, key)
   drawShareBars(state, key)
   drawBAvsParents(state, key)
   drawHeatmap(state, key)
