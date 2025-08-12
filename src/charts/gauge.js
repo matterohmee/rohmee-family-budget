@@ -43,8 +43,6 @@ export function drawGauge(state, key) {
   const svg = document.getElementById('ytdGauge')
   while (svg.firstChild) svg.removeChild(svg.firstChild)
   
-  // Redesigned layout - smaller donut, text outside
-  const cx = 200, cy = 150, r = 80, th = 16
   const year = key.slice(0, 4)
   const months = state.order.filter(k => k.slice(0, 4) === year && k <= key)
   const ytdSav = months.map(mk => Math.max(0, (state.months[mk].income || 0) - monthTotals(state, mk).aTotal)).reduce((a, b) => a + b, 0)
@@ -52,81 +50,73 @@ export function drawGauge(state, key) {
   const pct = target > 0 ? Math.min(1, ytdSav / target) : 0
   
   // Create gradients
-  const bgGradient = createGradient(svg, 'gaugeBg', '#1e293b', '#0f172a')
   const progressGradient = createGradient(svg, 'gaugeProgress', '#10b981', '#059669')
+  const bgGradient = createGradient(svg, 'gaugeBg', '#1e293b', '#0f172a')
   
-  // Background circle with glow effect
-  const bgGlow = ns('circle')
-  bgGlow.setAttribute('cx', cx)
-  bgGlow.setAttribute('cy', cy)
-  bgGlow.setAttribute('r', r + 3)
-  bgGlow.setAttribute('fill', 'none')
-  bgGlow.setAttribute('stroke', 'rgba(16, 185, 129, 0.2)')
-  bgGlow.setAttribute('stroke-width', 2)
-  bgGlow.setAttribute('opacity', '0.6')
-  svg.appendChild(bgGlow)
+  // LARGE CARD-STYLE LAYOUT - Focus on prominent data display
   
-  // Background circle
-  const base = ns('circle')
-  base.setAttribute('cx', cx)
-  base.setAttribute('cy', cy)
-  base.setAttribute('r', r)
-  base.setAttribute('fill', 'none')
-  base.setAttribute('stroke', bgGradient)
-  base.setAttribute('stroke-width', th)
-  base.setAttribute('stroke-linecap', 'round')
-  base.setAttribute('opacity', '0.3')
-  svg.appendChild(base)
-  
-  // Progress circle
-  const circ = 2 * Math.PI * r
-  const prog = ns('circle')
-  prog.setAttribute('cx', cx)
-  prog.setAttribute('cy', cy)
-  prog.setAttribute('r', r)
-  prog.setAttribute('fill', 'none')
-  prog.setAttribute('stroke', progressGradient)
-  prog.setAttribute('stroke-width', th)
-  prog.setAttribute('stroke-linecap', 'round')
-  prog.setAttribute('transform', `rotate(-90 ${cx} ${cy})`)
-  prog.setAttribute('stroke-dasharray', `0 ${circ}`)
-  prog.setAttribute('filter', 'drop-shadow(0 0 8px rgba(16, 185, 129, 0.4))')
-  
-  // Add smooth animation
-  prog.style.transition = 'stroke-dasharray 1.5s cubic-bezier(0.4, 0, 0.2, 1)'
-  svg.appendChild(prog)
-  
-  // Animate progress
-  requestAnimationFrame(() => {
-    setTimeout(() => {
-      prog.setAttribute('stroke-dasharray', `${circ * pct} ${circ * (1 - pct)}`)
-    }, 100)
-  })
-  
-  // TEXT OUTSIDE THE DONUT - Much larger and more readable
-  
-  // Large percentage display - positioned to the right of the donut
-  const percentText = text(cx + 120, cy - 20, '0%', 'start', '#f8fafc', 42, '700')
+  // Huge percentage display - center top
+  const percentText = text(380, 80, '0%', 'middle', '#10b981', 72, '800')
   svg.appendChild(percentText)
   
-  // Amount display - below the percentage
-  const amountText = text(cx + 120, cy + 10, `${fmt(real(state, ytdSav))} SEK`, 'start', '#10b981', 20, '600')
+  // Large amount display - center
+  const amountText = text(380, 130, `${fmt(real(state, ytdSav))} SEK`, 'middle', '#f8fafc', 32, '700')
   svg.appendChild(amountText)
   
-  // Target display - below the amount
-  const targetText = text(cx + 120, cy + 35, `of ${fmt(real(state, target))} SEK target`, 'start', '#94a3b8', 16, '500')
+  // Target context - below amount
+  const targetText = text(380, 160, `of ${fmt(real(state, target))} SEK target`, 'middle', '#94a3b8', 20, '500')
   svg.appendChild(targetText)
   
-  // Status indicator - below target with icon
+  // Status indicator with large icon
   const statusColor = pct >= 1 ? '#10b981' : pct >= 0.8 ? '#f59e0b' : '#ef4444'
   const statusText = pct >= 1 ? '✓ Target Achieved' : pct >= 0.8 ? '⚡ On Track' : '⚠ Behind Target'
   
-  const status = text(cx + 120, cy + 60, statusText, 'start', statusColor, 16, '600')
+  const status = text(380, 190, statusText, 'middle', statusColor, 24, '600')
   svg.appendChild(status)
   
-  // Add a subtle label above the donut
-  const label = text(cx, cy - r - 20, 'YTD Progress', 'middle', '#64748b', 14, '500')
-  svg.appendChild(label)
+  // Simple progress bar instead of donut - much more prominent
+  const barWidth = 300
+  const barHeight = 12
+  const barX = 380 - barWidth/2
+  const barY = 210
+  
+  // Background bar
+  const bgBar = ns('rect')
+  bgBar.setAttribute('x', barX)
+  bgBar.setAttribute('y', barY)
+  bgBar.setAttribute('width', barWidth)
+  bgBar.setAttribute('height', barHeight)
+  bgBar.setAttribute('fill', bgGradient)
+  bgBar.setAttribute('rx', 6)
+  bgBar.setAttribute('opacity', '0.3')
+  svg.appendChild(bgBar)
+  
+  // Progress bar with glow
+  const progBar = ns('rect')
+  progBar.setAttribute('x', barX)
+  progBar.setAttribute('y', barY)
+  progBar.setAttribute('width', 0)
+  progBar.setAttribute('height', barHeight)
+  progBar.setAttribute('fill', progressGradient)
+  progBar.setAttribute('rx', 6)
+  progBar.setAttribute('filter', 'drop-shadow(0 0 8px rgba(16, 185, 129, 0.6))')
+  progBar.style.transition = 'width 2s cubic-bezier(0.4, 0, 0.2, 1)'
+  svg.appendChild(progBar)
+  
+  // Animate progress bar
+  requestAnimationFrame(() => {
+    setTimeout(() => {
+      progBar.setAttribute('width', barWidth * pct)
+    }, 100)
+  })
+  
+  // Progress percentage labels
+  const progressLabels = ['0%', '25%', '50%', '75%', '100%']
+  progressLabels.forEach((label, i) => {
+    const x = barX + (barWidth * i / 4)
+    const labelEl = text(x, barY + 30, label, 'middle', '#64748b', 12, '500')
+    svg.appendChild(labelEl)
+  })
   
   // Animate percentage counting
   let currentPct = 0

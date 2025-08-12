@@ -43,8 +43,6 @@ export function drawFixedVar(state, key) {
   const svg = document.getElementById('fixedVarMini')
   while (svg.firstChild) svg.removeChild(svg.firstChild)
   
-  // Redesigned layout - smaller donut, text outside
-  const cx = 200, cy = 150, r = 80, th = 16
   const mt = monthTotals(state, key)
   
   let fixed = 0, variable = 0
@@ -53,105 +51,113 @@ export function drawFixedVar(state, key) {
   })
   
   const total = fixed + variable || 1
-  const circ = 2 * Math.PI * r
-  const cf = circ * (fixed / total)
-  const cv = circ * (variable / total)
+  const fixedPct = Math.round((fixed / total) * 100)
+  const variablePct = Math.round((variable / total) * 100)
   
   // Create gradients
   const fixedGradient = createGradient(svg, 'fixedGrad', '#8b5cf6', '#7c3aed')
   const variableGradient = createGradient(svg, 'variableGrad', '#06b6d4', '#0891b2')
-  const bgGradient = createGradient(svg, 'donutBg', '#1e293b', '#0f172a')
   
-  // Background glow
-  const bgGlow = ns('circle')
-  bgGlow.setAttribute('cx', cx)
-  bgGlow.setAttribute('cy', cy)
-  bgGlow.setAttribute('r', r + 3)
-  bgGlow.setAttribute('fill', 'none')
-  bgGlow.setAttribute('stroke', 'rgba(139, 92, 246, 0.2)')
-  bgGlow.setAttribute('stroke-width', 2)
-  bgGlow.setAttribute('opacity', '0.6')
-  svg.appendChild(bgGlow)
+  // LARGE CARD-STYLE LAYOUT - Side by side comparison
   
-  // Background circle
-  const base = ns('circle')
-  base.setAttribute('cx', cx)
-  base.setAttribute('cy', cy)
-  base.setAttribute('r', r)
-  base.setAttribute('fill', 'none')
-  base.setAttribute('stroke', bgGradient)
-  base.setAttribute('stroke-width', th)
-  base.setAttribute('opacity', '0.3')
-  svg.appendChild(base)
+  // Fixed Expenses Section (Left Side)
+  const fixedX = 200
   
-  // Fixed expenses arc
-  const arcF = ns('circle')
-  arcF.setAttribute('cx', cx)
-  arcF.setAttribute('cy', cy)
-  arcF.setAttribute('r', r)
-  arcF.setAttribute('fill', 'none')
-  arcF.setAttribute('stroke', fixedGradient)
-  arcF.setAttribute('stroke-width', th)
-  arcF.setAttribute('stroke-linecap', 'round')
-  arcF.setAttribute('transform', `rotate(-90 ${cx} ${cy})`)
-  arcF.setAttribute('stroke-dasharray', `0 ${circ}`)
-  arcF.setAttribute('filter', 'drop-shadow(0 0 6px rgba(139, 92, 246, 0.4))')
-  arcF.style.transition = 'stroke-dasharray 1.2s cubic-bezier(0.4, 0, 0.2, 1)'
-  svg.appendChild(arcF)
+  // Large Fixed percentage
+  const fixedPercentText = text(fixedX, 80, '0%', 'middle', '#8b5cf6', 64, '800')
+  svg.appendChild(fixedPercentText)
   
-  // Variable expenses arc
-  const arcV = ns('circle')
-  arcV.setAttribute('cx', cx)
-  arcV.setAttribute('cy', cy)
-  arcV.setAttribute('r', r)
-  arcV.setAttribute('fill', 'none')
-  arcV.setAttribute('stroke', variableGradient)
-  arcV.setAttribute('stroke-width', th)
-  arcV.setAttribute('stroke-linecap', 'round')
-  arcV.setAttribute('transform', `rotate(${-90 + (fixed / total) * 360} ${cx} ${cy})`)
-  arcV.setAttribute('stroke-dasharray', `0 ${circ}`)
-  arcV.setAttribute('filter', 'drop-shadow(0 0 6px rgba(6, 182, 212, 0.4))')
-  arcV.style.transition = 'stroke-dasharray 1.2s cubic-bezier(0.4, 0, 0.2, 1)'
-  svg.appendChild(arcV)
+  // Fixed label
+  const fixedLabelText = text(fixedX, 120, 'Fixed Expenses', 'middle', '#8b5cf6', 20, '600')
+  svg.appendChild(fixedLabelText)
   
-  // Animate arcs
+  // Fixed amount
+  const fixedAmountText = text(fixedX, 150, `${fmt(real(state, fixed))} SEK`, 'middle', '#a78bfa', 18, '500')
+  svg.appendChild(fixedAmountText)
+  
+  // Variable Expenses Section (Right Side)
+  const variableX = 560
+  
+  // Large Variable percentage
+  const variablePercentText = text(variableX, 80, '0%', 'middle', '#06b6d4', 64, '800')
+  svg.appendChild(variablePercentText)
+  
+  // Variable label
+  const variableLabelText = text(variableX, 120, 'Variable Expenses', 'middle', '#06b6d4', 20, '600')
+  svg.appendChild(variableLabelText)
+  
+  // Variable amount
+  const variableAmountText = text(variableX, 150, `${fmt(real(state, variable))} SEK`, 'middle', '#67e8f9', 18, '500')
+  svg.appendChild(variableAmountText)
+  
+  // Comparison bars at the bottom
+  const barY = 180
+  const barHeight = 20
+  const totalBarWidth = 400
+  const barStartX = 380 - totalBarWidth/2
+  
+  // Fixed bar
+  const fixedBarWidth = totalBarWidth * (fixed / total)
+  const fixedBar = ns('rect')
+  fixedBar.setAttribute('x', barStartX)
+  fixedBar.setAttribute('y', barY)
+  fixedBar.setAttribute('width', 0)
+  fixedBar.setAttribute('height', barHeight)
+  fixedBar.setAttribute('fill', fixedGradient)
+  fixedBar.setAttribute('rx', 10)
+  fixedBar.setAttribute('filter', 'drop-shadow(0 0 8px rgba(139, 92, 246, 0.4))')
+  fixedBar.style.transition = 'width 1.5s cubic-bezier(0.4, 0, 0.2, 1)'
+  svg.appendChild(fixedBar)
+  
+  // Variable bar
+  const variableBarWidth = totalBarWidth * (variable / total)
+  const variableBar = ns('rect')
+  variableBar.setAttribute('x', barStartX + fixedBarWidth)
+  variableBar.setAttribute('y', barY)
+  variableBar.setAttribute('width', 0)
+  variableBar.setAttribute('height', barHeight)
+  variableBar.setAttribute('fill', variableGradient)
+  variableBar.setAttribute('rx', 10)
+  variableBar.setAttribute('filter', 'drop-shadow(0 0 8px rgba(6, 182, 212, 0.4))')
+  variableBar.style.transition = 'width 1.5s cubic-bezier(0.4, 0, 0.2, 1)'
+  svg.appendChild(variableBar)
+  
+  // Background bar for context
+  const bgBar = ns('rect')
+  bgBar.setAttribute('x', barStartX)
+  bgBar.setAttribute('y', barY)
+  bgBar.setAttribute('width', totalBarWidth)
+  bgBar.setAttribute('height', barHeight)
+  bgBar.setAttribute('fill', '#1e293b')
+  bgBar.setAttribute('rx', 10)
+  bgBar.setAttribute('opacity', '0.3')
+  svg.insertBefore(bgBar, fixedBar)
+  
+  // Animate bars
   requestAnimationFrame(() => {
     setTimeout(() => {
-      arcF.setAttribute('stroke-dasharray', `${cf} ${circ - cf}`)
+      fixedBar.setAttribute('width', fixedBarWidth)
     }, 200)
     setTimeout(() => {
-      arcV.setAttribute('stroke-dasharray', `${cv} ${circ - cv}`)
+      variableBar.setAttribute('x', barStartX + fixedBarWidth)
+      variableBar.setAttribute('width', variableBarWidth)
     }, 400)
   })
   
-  // TEXT OUTSIDE THE DONUT - Much larger and more readable
+  // VS indicator in the middle
+  const vsText = text(380, 95, 'VS', 'middle', '#64748b', 16, '600')
+  svg.appendChild(vsText)
   
-  const fixedPct = Math.round((fixed / total) * 100)
-  const variablePct = Math.round((variable / total) * 100)
-  
-  // Add a subtle label above the donut
-  const label = text(cx, cy - r - 20, 'Expense Split', 'middle', '#64748b', 14, '500')
-  svg.appendChild(label)
-  
-  // Fixed expenses info - positioned to the right of the donut
-  const fixedPercentText = text(cx + 120, cy - 25, '0%', 'start', '#8b5cf6', 32, '700')
-  svg.appendChild(fixedPercentText)
-  
-  const fixedLabelText = text(cx + 120, cy - 5, 'Fixed Expenses', 'start', '#8b5cf6', 16, '600')
-  svg.appendChild(fixedLabelText)
-  
-  const fixedAmountText = text(cx + 120, cy + 15, `${fmt(real(state, fixed))} SEK`, 'start', '#a78bfa', 14, '500')
-  svg.appendChild(fixedAmountText)
-  
-  // Variable expenses info - below fixed expenses
-  const variablePercentText = text(cx + 120, cy + 45, '0%', 'start', '#06b6d4', 32, '700')
-  svg.appendChild(variablePercentText)
-  
-  const variableLabelText = text(cx + 120, cy + 65, 'Variable Expenses', 'start', '#06b6d4', 16, '600')
-  svg.appendChild(variableLabelText)
-  
-  const variableAmountText = text(cx + 120, cy + 85, `${fmt(real(state, variable))} SEK`, 'start', '#67e8f9', 14, '500')
-  svg.appendChild(variableAmountText)
+  // Divider line
+  const divider = ns('line')
+  divider.setAttribute('x1', 380)
+  divider.setAttribute('y1', 40)
+  divider.setAttribute('x2', 380)
+  divider.setAttribute('y2', 170)
+  divider.setAttribute('stroke', '#374151')
+  divider.setAttribute('stroke-width', 1)
+  divider.setAttribute('opacity', '0.5')
+  svg.appendChild(divider)
   
   // Animate text counting
   let currentFixed = 0, currentVariable = 0
@@ -174,28 +180,24 @@ export function drawFixedVar(state, key) {
   
   setTimeout(animateText, 300)
   
-  // Add interactive hover effects
-  arcF.style.cursor = 'pointer'
-  arcV.style.cursor = 'pointer'
+  // Add hover effects to bars
+  fixedBar.style.cursor = 'pointer'
+  variableBar.style.cursor = 'pointer'
   
-  arcF.addEventListener('mouseenter', () => {
-    arcF.setAttribute('stroke-width', th + 2)
-    arcF.style.filter = 'drop-shadow(0 0 12px rgba(139, 92, 246, 0.6))'
+  fixedBar.addEventListener('mouseenter', () => {
+    fixedBar.style.filter = 'drop-shadow(0 0 12px rgba(139, 92, 246, 0.6))'
   })
   
-  arcF.addEventListener('mouseleave', () => {
-    arcF.setAttribute('stroke-width', th)
-    arcF.style.filter = 'drop-shadow(0 0 6px rgba(139, 92, 246, 0.4))'
+  fixedBar.addEventListener('mouseleave', () => {
+    fixedBar.style.filter = 'drop-shadow(0 0 8px rgba(139, 92, 246, 0.4))'
   })
   
-  arcV.addEventListener('mouseenter', () => {
-    arcV.setAttribute('stroke-width', th + 2)
-    arcV.style.filter = 'drop-shadow(0 0 12px rgba(6, 182, 212, 0.6))'
+  variableBar.addEventListener('mouseenter', () => {
+    variableBar.style.filter = 'drop-shadow(0 0 12px rgba(6, 182, 212, 0.6))'
   })
   
-  arcV.addEventListener('mouseleave', () => {
-    arcV.setAttribute('stroke-width', th)
-    arcV.style.filter = 'drop-shadow(0 0 6px rgba(6, 182, 212, 0.4))'
+  variableBar.addEventListener('mouseleave', () => {
+    variableBar.style.filter = 'drop-shadow(0 0 8px rgba(6, 182, 212, 0.4))'
   })
 }
 
