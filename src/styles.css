@@ -71,7 +71,7 @@ body {
   background: var(--bg);
   color: var(--text-primary);
   line-height: 1.6;
-  font-size: 14px;
+  font-size: 16px; /* Increased from 14px */
   overflow-x: hidden;
 }
 
@@ -83,10 +83,10 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--text-primary);
 }
 
-h1 { font-size: 2rem; }
-h2 { font-size: 1.5rem; }
-h3 { font-size: 1.25rem; }
-h4 { font-size: 1.125rem; }
+h1 { font-size: 2.5rem; } /* Increased from 2rem */
+h2 { font-size: 1.875rem; } /* Increased from 1.5rem */
+h3 { font-size: 1.5rem; } /* Increased from 1.25rem */
+h4 { font-size: 1.25rem; } /* Increased from 1.125rem */
 
 /* Header */
 .topbar {
@@ -221,7 +221,7 @@ h4 { font-size: 1.125rem; }
 }
 
 .kpi .lab {
-  font-size: 0.75rem;
+  font-size: 0.875rem; /* Increased from 0.75rem */
   font-weight: 500;
   color: var(--text-muted);
   text-transform: uppercase;
@@ -230,7 +230,7 @@ h4 { font-size: 1.125rem; }
 }
 
 .kpi .val {
-  font-size: 1.75rem;
+  font-size: 2.25rem; /* Increased from 1.75rem */
   font-weight: 700;
   color: var(--text-primary);
   line-height: 1.2;
@@ -260,7 +260,7 @@ h4 { font-size: 1.125rem; }
 
 .controls label {
   display: block;
-  font-size: 0.75rem;
+  font-size: 0.875rem; /* Increased from 0.75rem */
   font-weight: 600;
   color: var(--text-secondary);
   text-transform: uppercase;
@@ -276,7 +276,7 @@ h4 { font-size: 1.125rem; }
   border: 1px solid var(--panel-border);
   background: rgba(10, 18, 36, 0.8);
   color: var(--text-primary);
-  font-size: 0.875rem;
+  font-size: 1rem; /* Increased from 0.875rem */
   font-family: var(--font-mono);
   transition: all var(--transition-normal);
   backdrop-filter: blur(10px);
@@ -304,7 +304,7 @@ h4 { font-size: 1.125rem; }
   background: var(--gradient-primary);
   color: white;
   font-weight: 600;
-  font-size: 0.875rem;
+  font-size: 1rem; /* Increased from 0.875rem */
   cursor: pointer;
   transition: all var(--transition-normal);
   text-transform: uppercase;
@@ -416,7 +416,7 @@ svg.chart:hover {
   display: flex;
   gap: var(--gap);
   flex-wrap: wrap;
-  font-size: 0.75rem;
+  font-size: 0.875rem; /* Increased from 0.75rem */
   font-weight: 500;
   color: var(--text-muted);
   margin-bottom: var(--gap-sm);
@@ -461,7 +461,7 @@ table {
 th, td {
   padding: var(--pad-sm) var(--pad);
   border-bottom: 1px solid var(--panel-border);
-  font-size: 0.875rem;
+  font-size: 1rem; /* Increased from 0.875rem */
   transition: all var(--transition-fast);
 }
 
@@ -472,7 +472,7 @@ th {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.025em;
-  font-size: 0.75rem;
+  font-size: 0.875rem; /* Increased from 0.75rem */
 }
 
 td {
@@ -567,4 +567,37 @@ tr.over td {
   .chart.tall {
     height: 500px;
   }
+}
+
+/* Chart Text Styling - Enhanced Readability */
+svg text {
+  font-size: 14px !important; /* Increased from default ~10-12px */
+  font-weight: 500;
+  fill: var(--text-primary);
+  font-family: var(--font-primary);
+}
+
+svg .gauge-text {
+  font-size: 18px !important; /* Larger for gauge center text */
+  font-weight: 600;
+}
+
+svg .gauge-label {
+  font-size: 16px !important; /* Larger for gauge labels */
+  font-weight: 500;
+}
+
+svg .chart-title {
+  font-size: 16px !important; /* Larger for chart titles */
+  font-weight: 600;
+}
+
+svg .axis-label {
+  font-size: 13px !important; /* Larger for axis labels */
+  font-weight: 500;
+}
+
+svg .legend-text {
+  font-size: 14px !important; /* Larger for legend text */
+  font-weight: 500;
 }
