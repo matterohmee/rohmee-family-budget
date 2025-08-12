@@ -43,7 +43,8 @@ export function drawFixedVar(state, key) {
   const svg = document.getElementById('fixedVarMini')
   while (svg.firstChild) svg.removeChild(svg.firstChild)
   
-  const cx = 380, cy = 150, r = 100, th = 20
+  // Redesigned layout - smaller donut, text outside
+  const cx = 200, cy = 150, r = 80, th = 16
   const mt = monthTotals(state, key)
   
   let fixed = 0, variable = 0
@@ -65,7 +66,7 @@ export function drawFixedVar(state, key) {
   const bgGlow = ns('circle')
   bgGlow.setAttribute('cx', cx)
   bgGlow.setAttribute('cy', cy)
-  bgGlow.setAttribute('r', r + 5)
+  bgGlow.setAttribute('r', r + 3)
   bgGlow.setAttribute('fill', 'none')
   bgGlow.setAttribute('stroke', 'rgba(139, 92, 246, 0.2)')
   bgGlow.setAttribute('stroke-width', 2)
@@ -123,15 +124,34 @@ export function drawFixedVar(state, key) {
     }, 400)
   })
   
-  // Center text with animation
+  // TEXT OUTSIDE THE DONUT - Much larger and more readable
+  
   const fixedPct = Math.round((fixed / total) * 100)
   const variablePct = Math.round((variable / total) * 100)
   
-  const fixedText = text(cx, cy - 8, '0% Fixed', 'middle', '#f8fafc', 16, '600')
-  const variableText = text(cx, cy + 12, '0% Variable', 'middle', '#94a3b8', 14, '500')
+  // Add a subtle label above the donut
+  const label = text(cx, cy - r - 20, 'Expense Split', 'middle', '#64748b', 14, '500')
+  svg.appendChild(label)
   
-  svg.appendChild(fixedText)
-  svg.appendChild(variableText)
+  // Fixed expenses info - positioned to the right of the donut
+  const fixedPercentText = text(cx + 120, cy - 25, '0%', 'start', '#8b5cf6', 32, '700')
+  svg.appendChild(fixedPercentText)
+  
+  const fixedLabelText = text(cx + 120, cy - 5, 'Fixed Expenses', 'start', '#8b5cf6', 16, '600')
+  svg.appendChild(fixedLabelText)
+  
+  const fixedAmountText = text(cx + 120, cy + 15, `${fmt(real(state, fixed))} SEK`, 'start', '#a78bfa', 14, '500')
+  svg.appendChild(fixedAmountText)
+  
+  // Variable expenses info - below fixed expenses
+  const variablePercentText = text(cx + 120, cy + 45, '0%', 'start', '#06b6d4', 32, '700')
+  svg.appendChild(variablePercentText)
+  
+  const variableLabelText = text(cx + 120, cy + 65, 'Variable Expenses', 'start', '#06b6d4', 16, '600')
+  svg.appendChild(variableLabelText)
+  
+  const variableAmountText = text(cx + 120, cy + 85, `${fmt(real(state, variable))} SEK`, 'start', '#67e8f9', 14, '500')
+  svg.appendChild(variableAmountText)
   
   // Animate text counting
   let currentFixed = 0, currentVariable = 0
@@ -142,11 +162,11 @@ export function drawFixedVar(state, key) {
     if (currentFixed < fixedPct || currentVariable < variablePct) {
       if (currentFixed < fixedPct) {
         currentFixed += incrementFixed
-        fixedText.textContent = Math.round(Math.min(currentFixed, fixedPct)) + '% Fixed'
+        fixedPercentText.textContent = Math.round(Math.min(currentFixed, fixedPct)) + '%'
       }
       if (currentVariable < variablePct) {
         currentVariable += incrementVariable
-        variableText.textContent = Math.round(Math.min(currentVariable, variablePct)) + '% Variable'
+        variablePercentText.textContent = Math.round(Math.min(currentVariable, variablePct)) + '%'
       }
       requestAnimationFrame(animateText)
     }
@@ -178,3 +198,5 @@ export function drawFixedVar(state, key) {
     arcV.style.filter = 'drop-shadow(0 0 6px rgba(6, 182, 212, 0.4))'
   })
 }
+
+function fmt(n) { return (Math.round(n)).toLocaleString('sv-SE') }

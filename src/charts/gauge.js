@@ -43,7 +43,8 @@ export function drawGauge(state, key) {
   const svg = document.getElementById('ytdGauge')
   while (svg.firstChild) svg.removeChild(svg.firstChild)
   
-  const cx = 380, cy = 150, r = 100, th = 20
+  // Redesigned layout - smaller donut, text outside
+  const cx = 200, cy = 150, r = 80, th = 16
   const year = key.slice(0, 4)
   const months = state.order.filter(k => k.slice(0, 4) === year && k <= key)
   const ytdSav = months.map(mk => Math.max(0, (state.months[mk].income || 0) - monthTotals(state, mk).aTotal)).reduce((a, b) => a + b, 0)
@@ -58,7 +59,7 @@ export function drawGauge(state, key) {
   const bgGlow = ns('circle')
   bgGlow.setAttribute('cx', cx)
   bgGlow.setAttribute('cy', cy)
-  bgGlow.setAttribute('r', r + 5)
+  bgGlow.setAttribute('r', r + 3)
   bgGlow.setAttribute('fill', 'none')
   bgGlow.setAttribute('stroke', 'rgba(16, 185, 129, 0.2)')
   bgGlow.setAttribute('stroke-width', 2)
@@ -102,9 +103,30 @@ export function drawGauge(state, key) {
     }, 100)
   })
   
-  // Center percentage text with animation
-  const percentText = text(cx, cy - 8, '0%', 'middle', '#f8fafc', 28, '700')
+  // TEXT OUTSIDE THE DONUT - Much larger and more readable
+  
+  // Large percentage display - positioned to the right of the donut
+  const percentText = text(cx + 120, cy - 20, '0%', 'start', '#f8fafc', 42, '700')
   svg.appendChild(percentText)
+  
+  // Amount display - below the percentage
+  const amountText = text(cx + 120, cy + 10, `${fmt(real(state, ytdSav))} SEK`, 'start', '#10b981', 20, '600')
+  svg.appendChild(amountText)
+  
+  // Target display - below the amount
+  const targetText = text(cx + 120, cy + 35, `of ${fmt(real(state, target))} SEK target`, 'start', '#94a3b8', 16, '500')
+  svg.appendChild(targetText)
+  
+  // Status indicator - below target with icon
+  const statusColor = pct >= 1 ? '#10b981' : pct >= 0.8 ? '#f59e0b' : '#ef4444'
+  const statusText = pct >= 1 ? '✓ Target Achieved' : pct >= 0.8 ? '⚡ On Track' : '⚠ Behind Target'
+  
+  const status = text(cx + 120, cy + 60, statusText, 'start', statusColor, 16, '600')
+  svg.appendChild(status)
+  
+  // Add a subtle label above the donut
+  const label = text(cx, cy - r - 20, 'YTD Progress', 'middle', '#64748b', 14, '500')
+  svg.appendChild(label)
   
   // Animate percentage counting
   let currentPct = 0
@@ -120,17 +142,6 @@ export function drawGauge(state, key) {
   }
   
   setTimeout(animatePercentage, 200)
-  
-  // Subtitle with better styling
-  const subtitleText = text(cx, cy + 25, `${fmt(real(state, ytdSav))} / ${fmt(real(state, target))} SEK`, 'middle', '#94a3b8', 13, '500')
-  svg.appendChild(subtitleText)
-  
-  // Add status indicator
-  const statusColor = pct >= 1 ? '#10b981' : pct >= 0.8 ? '#f59e0b' : '#ef4444'
-  const statusText = pct >= 1 ? '✓ Target Achieved' : pct >= 0.8 ? '⚡ On Track' : '⚠ Behind Target'
-  
-  const status = text(cx, cy + 45, statusText, 'middle', statusColor, 11, '600')
-  svg.appendChild(status)
 }
 
 function fmt(n) { return (Math.round(n)).toLocaleString('sv-SE') }
