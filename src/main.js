@@ -109,7 +109,7 @@ addInsightsStyles()
 // ---------- First render ----------
 drawAll()
 renderInsights(state, currentMonth())
-renderTable(state)
+renderTable(state, onStateChange)
 
 // ---------- Expose helpers for overrides ----------
 window.state = state
@@ -125,7 +125,7 @@ function onStateChange(){
   renderKPIs(state, currentMonth())
   drawAll()
   renderInsights(state, currentMonth())
-  renderTable(state)
+  renderTable(state, onStateChange)
 }
 
 function renderKPIs(st, key){
@@ -163,7 +163,7 @@ function drawAll(){
   drawBAvsParents(state, key)
   drawHeatmap(state, key)
   drawBridge(state, key)
-  renderTable(state)
+  renderTable(state, onStateChange)
 }
 
 function fmt(n){ return (Math.round(n)).toLocaleString('sv-SE') }
