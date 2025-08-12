@@ -58,42 +58,42 @@ export function drawFixedVar(state, key) {
   const fixedGradient = createGradient(svg, 'fixedGrad', '#8b5cf6', '#7c3aed')
   const variableGradient = createGradient(svg, 'variableGrad', '#06b6d4', '#0891b2')
   
-  // LARGE CARD-STYLE LAYOUT - Side by side comparison
+  // MASSIVE CARD-STYLE LAYOUT - Side by side comparison with HUGE fonts
   
   // Fixed Expenses Section (Left Side)
   const fixedX = 200
   
-  // Large Fixed percentage
-  const fixedPercentText = text(fixedX, 80, '0%', 'middle', '#8b5cf6', 64, '800')
+  // ENORMOUS Fixed percentage - MUCH LARGER
+  const fixedPercentText = text(fixedX, 120, '0%', 'middle', '#8b5cf6', 96, '900')
   svg.appendChild(fixedPercentText)
   
-  // Fixed label
-  const fixedLabelText = text(fixedX, 120, 'Fixed Expenses', 'middle', '#8b5cf6', 20, '600')
+  // Fixed label - LARGER
+  const fixedLabelText = text(fixedX, 170, 'Fixed Expenses', 'middle', '#8b5cf6', 32, '600')
   svg.appendChild(fixedLabelText)
   
-  // Fixed amount
-  const fixedAmountText = text(fixedX, 150, `${fmt(real(state, fixed))} SEK`, 'middle', '#a78bfa', 18, '500')
+  // Fixed amount - LARGER
+  const fixedAmountText = text(fixedX, 210, `${fmt(real(state, fixed))} SEK`, 'middle', '#a78bfa', 28, '500')
   svg.appendChild(fixedAmountText)
   
   // Variable Expenses Section (Right Side)
   const variableX = 560
   
-  // Large Variable percentage
-  const variablePercentText = text(variableX, 80, '0%', 'middle', '#06b6d4', 64, '800')
+  // ENORMOUS Variable percentage - MUCH LARGER
+  const variablePercentText = text(variableX, 120, '0%', 'middle', '#06b6d4', 96, '900')
   svg.appendChild(variablePercentText)
   
-  // Variable label
-  const variableLabelText = text(variableX, 120, 'Variable Expenses', 'middle', '#06b6d4', 20, '600')
+  // Variable label - LARGER
+  const variableLabelText = text(variableX, 170, 'Variable Expenses', 'middle', '#06b6d4', 32, '600')
   svg.appendChild(variableLabelText)
   
-  // Variable amount
-  const variableAmountText = text(variableX, 150, `${fmt(real(state, variable))} SEK`, 'middle', '#67e8f9', 18, '500')
+  // Variable amount - LARGER
+  const variableAmountText = text(variableX, 210, `${fmt(real(state, variable))} SEK`, 'middle', '#67e8f9', 28, '500')
   svg.appendChild(variableAmountText)
   
-  // Comparison bars at the bottom
-  const barY = 180
-  const barHeight = 20
-  const totalBarWidth = 400
+  // LARGER comparison bars at the bottom
+  const barY = 240
+  const barHeight = 30
+  const totalBarWidth = 500
   const barStartX = 380 - totalBarWidth/2
   
   // Fixed bar
@@ -104,7 +104,7 @@ export function drawFixedVar(state, key) {
   fixedBar.setAttribute('width', 0)
   fixedBar.setAttribute('height', barHeight)
   fixedBar.setAttribute('fill', fixedGradient)
-  fixedBar.setAttribute('rx', 10)
+  fixedBar.setAttribute('rx', 15)
   fixedBar.setAttribute('filter', 'drop-shadow(0 0 8px rgba(139, 92, 246, 0.4))')
   fixedBar.style.transition = 'width 1.5s cubic-bezier(0.4, 0, 0.2, 1)'
   svg.appendChild(fixedBar)
@@ -117,19 +117,19 @@ export function drawFixedVar(state, key) {
   variableBar.setAttribute('width', 0)
   variableBar.setAttribute('height', barHeight)
   variableBar.setAttribute('fill', variableGradient)
-  variableBar.setAttribute('rx', 10)
+  variableBar.setAttribute('rx', 15)
   variableBar.setAttribute('filter', 'drop-shadow(0 0 8px rgba(6, 182, 212, 0.4))')
   variableBar.style.transition = 'width 1.5s cubic-bezier(0.4, 0, 0.2, 1)'
   svg.appendChild(variableBar)
   
-  // Background bar for context
+  // Background bar for context - LARGER
   const bgBar = ns('rect')
   bgBar.setAttribute('x', barStartX)
   bgBar.setAttribute('y', barY)
   bgBar.setAttribute('width', totalBarWidth)
   bgBar.setAttribute('height', barHeight)
   bgBar.setAttribute('fill', '#1e293b')
-  bgBar.setAttribute('rx', 10)
+  bgBar.setAttribute('rx', 15)
   bgBar.setAttribute('opacity', '0.3')
   svg.insertBefore(bgBar, fixedBar)
   
@@ -144,18 +144,18 @@ export function drawFixedVar(state, key) {
     }, 400)
   })
   
-  // VS indicator in the middle
-  const vsText = text(380, 95, 'VS', 'middle', '#64748b', 16, '600')
+  // VS indicator in the middle - LARGER
+  const vsText = text(380, 140, 'VS', 'middle', '#64748b', 24, '600')
   svg.appendChild(vsText)
   
-  // Divider line
+  // Divider line - LONGER
   const divider = ns('line')
   divider.setAttribute('x1', 380)
-  divider.setAttribute('y1', 40)
+  divider.setAttribute('y1', 60)
   divider.setAttribute('x2', 380)
-  divider.setAttribute('y2', 170)
+  divider.setAttribute('y2', 230)
   divider.setAttribute('stroke', '#374151')
-  divider.setAttribute('stroke-width', 1)
+  divider.setAttribute('stroke-width', 2)
   divider.setAttribute('opacity', '0.5')
   svg.appendChild(divider)
   

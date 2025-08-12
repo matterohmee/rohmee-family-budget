@@ -394,7 +394,7 @@ h4 { font-size: 1.25rem; } /* Increased from 1.125rem */
 /* Chart Styles */
 svg.chart {
   width: 100%;
-  height: 420px;
+  height: 500px; /* Increased from 420px for larger fonts */
   background: rgba(9, 18, 35, 0.8);
   backdrop-filter: blur(10px);
   border: 1px solid var(--panel-border);
@@ -403,9 +403,9 @@ svg.chart {
   transition: all var(--transition-normal);
 }
 
-.chart.small { height: 320px; }
-.chart.tiny { height: 300px; }
-.chart.tall { height: 700px; }
+.chart.small { height: 450px; } /* Increased from 320px */
+.chart.tiny { height: 400px; } /* Increased from 300px */
+.chart.tall { height: 800px; } /* Increased from 700px */
 
 svg.chart:hover {
   border-color: var(--accent-secondary);

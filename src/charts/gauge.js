@@ -53,32 +53,32 @@ export function drawGauge(state, key) {
   const progressGradient = createGradient(svg, 'gaugeProgress', '#10b981', '#059669')
   const bgGradient = createGradient(svg, 'gaugeBg', '#1e293b', '#0f172a')
   
-  // LARGE CARD-STYLE LAYOUT - Focus on prominent data display
+  // MASSIVE CARD-STYLE LAYOUT - HUGE fonts and larger dimensions
   
-  // Huge percentage display - center top
-  const percentText = text(380, 80, '0%', 'middle', '#10b981', 72, '800')
+  // ENORMOUS percentage display - center top - MUCH LARGER
+  const percentText = text(380, 120, '0%', 'middle', '#10b981', 120, '900')
   svg.appendChild(percentText)
   
-  // Large amount display - center
-  const amountText = text(380, 130, `${fmt(real(state, ytdSav))} SEK`, 'middle', '#f8fafc', 32, '700')
+  // LARGE amount display - center - MUCH LARGER
+  const amountText = text(380, 180, `${fmt(real(state, ytdSav))} SEK`, 'middle', '#f8fafc', 48, '700')
   svg.appendChild(amountText)
   
-  // Target context - below amount
-  const targetText = text(380, 160, `of ${fmt(real(state, target))} SEK target`, 'middle', '#94a3b8', 20, '500')
+  // Target context - below amount - LARGER
+  const targetText = text(380, 220, `of ${fmt(real(state, target))} SEK target`, 'middle', '#94a3b8', 32, '500')
   svg.appendChild(targetText)
   
-  // Status indicator with large icon
+  // Status indicator with large icon - LARGER
   const statusColor = pct >= 1 ? '#10b981' : pct >= 0.8 ? '#f59e0b' : '#ef4444'
   const statusText = pct >= 1 ? '✓ Target Achieved' : pct >= 0.8 ? '⚡ On Track' : '⚠ Behind Target'
   
-  const status = text(380, 190, statusText, 'middle', statusColor, 24, '600')
+  const status = text(380, 260, statusText, 'middle', statusColor, 36, '600')
   svg.appendChild(status)
   
-  // Simple progress bar instead of donut - much more prominent
-  const barWidth = 300
-  const barHeight = 12
+  // LARGER progress bar - much more prominent
+  const barWidth = 400
+  const barHeight = 20
   const barX = 380 - barWidth/2
-  const barY = 210
+  const barY = 280
   
   // Background bar
   const bgBar = ns('rect')
@@ -87,7 +87,7 @@ export function drawGauge(state, key) {
   bgBar.setAttribute('width', barWidth)
   bgBar.setAttribute('height', barHeight)
   bgBar.setAttribute('fill', bgGradient)
-  bgBar.setAttribute('rx', 6)
+  bgBar.setAttribute('rx', 10)
   bgBar.setAttribute('opacity', '0.3')
   svg.appendChild(bgBar)
   
@@ -98,7 +98,7 @@ export function drawGauge(state, key) {
   progBar.setAttribute('width', 0)
   progBar.setAttribute('height', barHeight)
   progBar.setAttribute('fill', progressGradient)
-  progBar.setAttribute('rx', 6)
+  progBar.setAttribute('rx', 10)
   progBar.setAttribute('filter', 'drop-shadow(0 0 8px rgba(16, 185, 129, 0.6))')
   progBar.style.transition = 'width 2s cubic-bezier(0.4, 0, 0.2, 1)'
   svg.appendChild(progBar)
@@ -110,11 +110,11 @@ export function drawGauge(state, key) {
     }, 100)
   })
   
-  // Progress percentage labels
+  // Progress percentage labels - LARGER
   const progressLabels = ['0%', '25%', '50%', '75%', '100%']
   progressLabels.forEach((label, i) => {
     const x = barX + (barWidth * i / 4)
-    const labelEl = text(x, barY + 30, label, 'middle', '#64748b', 12, '500')
+    const labelEl = text(x, barY + 40, label, 'middle', '#64748b', 18, '500')
     svg.appendChild(labelEl)
   })
   
