@@ -64,36 +64,36 @@ export function drawFixedVar(state, key) {
   const fixedX = 200
   
   // ENORMOUS Fixed percentage - MUCH LARGER
-  const fixedPercentText = text(fixedX, 120, '0%', 'middle', '#8b5cf6', 120, '900')
+  const fixedPercentText = text(fixedX, 150, '0%', 'middle', '#8b5cf6', 160, '900')
   svg.appendChild(fixedPercentText)
   
   // Fixed label - LARGER
-  const fixedLabelText = text(fixedX, 170, 'Fixed Expenses', 'middle', '#8b5cf6', 40, '600')
+  const fixedLabelText = text(fixedX, 220, 'Fixed Expenses', 'middle', '#8b5cf6', 50, '600')
   svg.appendChild(fixedLabelText)
   
   // Fixed amount - LARGER
-  const fixedAmountText = text(fixedX, 210, `${fmt(real(state, fixed))} SEK`, 'middle', '#a78bfa', 36, '500')
+  const fixedAmountText = text(fixedX, 280, `${fmt(real(state, fixed))} SEK`, 'middle', '#a78bfa', 40, '500')
   svg.appendChild(fixedAmountText)
   
   // Variable Expenses Section (Right Side)
   const variableX = 560
   
   // ENORMOUS Variable percentage - MUCH LARGER
-  const variablePercentText = text(variableX, 120, '0%', 'middle', '#06b6d4', 120, '900')
+  const variablePercentText = text(variableX, 150, '0%', 'middle', '#06b6d4', 160, '900')
   svg.appendChild(variablePercentText)
   
   // Variable label - LARGER
-  const variableLabelText = text(variableX, 170, 'Variable Expenses', 'middle', '#06b6d4', 40, '600')
+  const variableLabelText = text(variableX, 220, 'Variable Expenses', 'middle', '#06b6d4', 50, '600')
   svg.appendChild(variableLabelText)
   
   // Variable amount - LARGER
-  const variableAmountText = text(variableX, 210, `${fmt(real(state, variable))} SEK`, 'middle', '#67e8f9', 36, '500')
+  const variableAmountText = text(variableX, 280, `${fmt(real(state, variable))} SEK`, 'middle', '#67e8f9', 40, '500')
   svg.appendChild(variableAmountText)
   
   // LARGER comparison bars at the bottom
-  const barY = 240
-  const barHeight = 30
-  const totalBarWidth = 500
+  const barY = 320
+  const barHeight = 40
+  const totalBarWidth = 600
   const barStartX = 380 - totalBarWidth/2
   
   // Fixed bar

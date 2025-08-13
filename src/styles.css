@@ -403,7 +403,7 @@ svg.chart {
   transition: all var(--transition-normal);
 }
 
-.chart.small { height: 450px; } /* Increased from 320px */
+.chart.small { height: 250px; } /* Increased from 320px */
 .chart.tiny { height: 400px; } /* Increased from 300px */
 .chart.tall { height: 800px; } /* Increased from 700px */
 
