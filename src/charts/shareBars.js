@@ -12,10 +12,23 @@ export function drawShareBars(state, key){
   const n=arr.length, rw=innerH/n*0.75
   arr.forEach((e,i)=>{
     const y=padT + i*(innerH/n) + (innerH/n-rw)/2, w=(e.v/total)*innerW
-    const r=ns('rect'); r.setAttribute('x',padL); r.setAttribute('y',y); r.setAttribute('width',w); r.setAttribute('height',rw); r.setAttribute('fill','#3b82f6'); svg.appendChild(r)
+    
+    // Determine color based on highlighting
+    let fillColor = '#3b82f6'
+    let opacity = 1
+    if(state.highlightedCategory) {
+      if(e.p === state.highlightedCategory) {
+        fillColor = '#1d4ed8' // Brighter blue for highlighted
+        opacity = 1
+      } else {
+        opacity = 0.3 // Fade non-highlighted categories
+      }
+    }
+    
+    const r=ns('rect'); r.setAttribute('x',padL); r.setAttribute('y',y); r.setAttribute('width',w); r.setAttribute('height',rw); r.setAttribute('fill',fillColor); r.setAttribute('opacity',opacity); svg.appendChild(r)
     const lab=(state.icons[e.p]||'')+' '+e.p
-    svg.appendChild(text(padL-16, y+rw/2+6, lab, 'end', '#cbd5e1', 15))
-    svg.appendChild(text(padL + w + 12, y+rw/2+6, ((e.v/total)*100).toFixed(1)+'%  ·  '+fmt(real(state,e.v))+' SEK', 'start', '#cbd5e1', 14))
+    svg.appendChild(text(padL-16, y+rw/2+6, lab, 'end', state.highlightedCategory === e.p ? '#ffffff' : '#cbd5e1', 20))
+    svg.appendChild(text(padL + w + 12, y+rw/2+6, ((e.v/total)*100).toFixed(1)+'%  ·  '+fmt(real(state,e.v))+' SEK', 'start', state.highlightedCategory === e.p ? '#ffffff' : '#cbd5e1', 18))
   })
   const ax=ns('line'); ax.setAttribute('x1',padL); ax.setAttribute('x2',padL); ax.setAttribute('y1',padT); ax.setAttribute('y2',padT+innerH); ax.setAttribute('stroke','#243049'); svg.appendChild(ax)
 }

@@ -17,6 +17,7 @@ import { drawSpendingTrends } from './charts/spendingTrends.js'
 
 // App state (mutable)
 export let state = loadState()
+state.highlightedCategory = null // New state variable for highlighting
 
 // ---------- Layout ----------
 const app = document.getElementById('app')
@@ -148,9 +149,12 @@ function renderKPIs(st, key){
     const card = document.createElement('div')
     card.className='kpi'
     card.innerHTML = `<div class="lab">${it.lab}</div><div class="val">${it.val}</div>`
+    card.onclick = () => {
+      state.highlightedCategory = it.lab // Set highlighted category
+      onStateChange() // Trigger full dashboard update
+    }
     kpi.appendChild(card)
-  })
-}
+  })}
 
 function drawAll(){
   const key = document.getElementById('monthSel').value

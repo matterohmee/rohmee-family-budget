@@ -23,6 +23,13 @@ export function drawHeatmap(state, key){
   matrix.forEach((row,ri)=>{
     row.forEach((cell,ci)=>{
       const r=ns('rect'); r.setAttribute('x', padL + ci*cw); r.setAttribute('y', padT + ri*ch); r.setAttribute('width', cw-2); r.setAttribute('height', ch-2); r.setAttribute('fill', color(cell.v))
+      
+      // Add highlighting border for selected category
+      if(state.highlightedCategory && cell.p === state.highlightedCategory) {
+        r.setAttribute('stroke', '#3b82f6')
+        r.setAttribute('stroke-width', '3')
+      }
+      
       r.addEventListener('mouseenter', ev=>{
         const tt=document.getElementById('tooltip'); const diff=cell.a-cell.b; const sign=diff>=0?'+':''
         tt.innerHTML = `<div><b>${cell.p}</b> · <span class='t'>${cell.m}</span></div>
@@ -35,8 +42,9 @@ export function drawHeatmap(state, key){
       r.addEventListener('mouseleave', ()=>{ document.getElementById('tooltip').style.display='none' })
       svg.appendChild(r)
     })
-    const lab=(state.icons[rows[ri]]||'')+' '+rows[ri]; svg.appendChild(text(padL-14, padT + ri*ch + ch/2 + 4, lab, 'end', '#cbd5e1', 14))
+    const lab=(state.icons[rows[ri]]||'')+' '+rows[ri]; 
+    svg.appendChild(text(padL-14, padT + ri*ch + ch/2 + 4, lab, 'end', state.highlightedCategory === rows[ri] ? '#ffffff' : '#cbd5e1', 18))
   })
-  months.forEach((mk,ci)=> svg.appendChild(text(padL + ci*cw + cw/2, H-12, mk.slice(5), 'middle', '#9aa3b2', 12)))
+  months.forEach((mk,ci)=> svg.appendChild(text(padL + ci*cw + cw/2, H-12, mk.slice(5), 'middle', '#9aa3b2', 16)))
 }
 function fmt(n){ return (Math.round(n)).toLocaleString('sv-SE') }

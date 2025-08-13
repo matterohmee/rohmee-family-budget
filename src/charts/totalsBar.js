@@ -16,8 +16,8 @@ export function drawTotalsBar(state, key){
     const y=padT + i*(innerH/rows.length) + (innerH/rows.length - rw)/2
     const w=(r.val/max)*innerW
     const bar=ns('rect'); bar.setAttribute('x',padL); bar.setAttribute('y',y); bar.setAttribute('width',w); bar.setAttribute('height',rw); bar.setAttribute('fill',r.c); svg.appendChild(bar)
-    svg.appendChild(text(padL-10, y+rw/2+4, r.lab, 'end', '#cbd5e1', 12))
-    svg.appendChild(text(padL+w+6, y+rw/2+4, fmt(real(state,r.val)), 'start', '#cbd5e1', 12))
+    svg.appendChild(text(padL-10, y+rw/2+4, r.lab, 'end', '#cbd5e1', 16))
+    svg.appendChild(text(padL+w+6, y+rw/2+4, fmt(real(state,r.val)), 'start', '#cbd5e1', 16))
   })
   const ax=ns('line'); ax.setAttribute('x1',padL); ax.setAttribute('x2',padL); ax.setAttribute('y1',padT); ax.setAttribute('y2',padT+innerH); ax.setAttribute('stroke','#243049'); svg.appendChild(ax)
 }

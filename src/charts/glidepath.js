@@ -24,11 +24,11 @@ export function drawGlidepath(state, key){
     const h=(s.v/ymax)*innerH, x=padL + i*(innerW/months.length) + ((innerW/months.length)-bw)/2, y=padT + innerH - h
     const color = s.t==='a' ? (s.v>=mTarget ? '#10b981' : '#ef4444') : '#f59e0b'
     const r=ns('rect'); r.setAttribute('x',x); r.setAttribute('y',y); r.setAttribute('width',bw); r.setAttribute('height',h); r.setAttribute('fill',color); svg.appendChild(r)
-    svg.appendChild(text(x+bw/2, H-16, s.m.slice(5), 'middle', '#9aa3b2', 12))
+    svg.appendChild(text(x+bw/2, H-16, s.m.slice(5), 'middle', '#9aa3b2', 16))
   })
   const ty=padT + innerH - (mTarget/ymax)*innerH
   const line=ns('line'); line.setAttribute('x1', padL); line.setAttribute('x2', padL+innerW); line.setAttribute('y1', ty); line.setAttribute('y2', ty); line.setAttribute('stroke','#93c5fd'); line.setAttribute('stroke-dasharray','5,5'); svg.appendChild(line)
-  svg.appendChild(text(padL+innerW-6, ty-6, 'Monthly target '+fmt(real(state,mTarget)), 'end', '#cfe4ff', 12))
+  svg.appendChild(text(padL+innerW-6, ty-6, 'Monthly target '+fmt(real(state,mTarget)), 'end', '#cfe4ff', 16))
   const pill=document.getElementById('glidePill')
   if(pill){ if(remaining<=0){ pill.textContent='On track ✔'; pill.classList.add('ok') } else { pill.textContent='From now: need '+fmt(real(state,req))+' SEK / month'; pill.classList.remove('ok') } }
 }
