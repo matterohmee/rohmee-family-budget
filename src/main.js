@@ -14,6 +14,7 @@ import { drawBAvsParents } from './charts/baParents.js'
 import { drawHeatmap } from './charts/heatmap.js'
 import { drawBridge } from './charts/bridge.js'
 import { drawSpendingTrends } from './charts/spendingTrends.js'
+import { drawMonthlyTrends } from './charts/monthlyTrends.js'
 
 // App state (mutable)
 export let state = loadState()
@@ -53,6 +54,13 @@ app.innerHTML = `
 
   <div class="panel">
     <div id="insightsPanel" class="insights-panel"></div>
+  </div>
+
+  <div class="panel">
+    <div class="legend">
+      <span><i class="sw" style="background:#3b82f6"></i>Monthly Income vs. Expenses Over Time</span>
+    </div>
+    <svg id="monthlyTrends" class="chart" viewBox="0 0 1200 400" aria-label="Monthly Income vs. Expenses Over Time"></svg>
   </div>
 
   <div class="panel">
@@ -163,11 +171,10 @@ function drawAll(){
   drawGlidepath(state, key)
   drawTotalsBar(state, key)
   drawSpendingTrends(state, key)
-  drawShareBars(state, key)
-  drawBAvsParents(state, key)
-  drawHeatmap(state, key)
-  drawBridge(state, key)
-  renderTable(state, onStateChange)
-}
+  drawMonthlyTrends(state, key);
+  drawShareBars(state, key);
+  drawBAvsParents(state, key);
+  drawHeatmap(state, key);
+  drawBridge(state, key);}
 
 function fmt(n){ return (Math.round(n)).toLocaleString('sv-SE') }
