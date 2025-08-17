@@ -571,29 +571,19 @@ tr.over td {
 
 /* Chart Text Styling - Enhanced Readability */
 svg text {
-  font-size: 14px !important; /* Increased from default ~10-12px */
   font-weight: 500;
   fill: var(--text-primary);
   font-family: var(--font-primary);
 }
 
-svg .gauge-text {
-  font-size: 18px !important; /* Larger for gauge center text */
-  font-weight: 600;
-}
-
-svg .gauge-label {
-  font-size: 16px !important; /* Larger for gauge labels */
-  font-weight: 500;
-}
-
+/* Allow specific chart elements to have their own font sizes */
 svg .chart-title {
-  font-size: 16px !important; /* Larger for chart titles */
+  font-size: 16px;
   font-weight: 600;
 }
 
 svg .axis-label {
-  font-size: 13px !important; /* Larger for axis labels */
+  font-size: 13px;
   font-weight: 500;
 }
 

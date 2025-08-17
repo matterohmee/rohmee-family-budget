@@ -27,6 +27,27 @@ export function renderTable(state, onStateChange){
       state.order.forEach(k=>{ const mm=state.months[k]; mm.budget[nn]=mm.budget[p]; mm.actual[nn]=mm.actual[p]; delete mm.budget[p]; delete mm.actual[p]; })
       if(onStateChange) onStateChange();
     }
+    
+    // Add click handler for category highlighting
+    trP.onclick = (e) => {
+      // Don't trigger if clicking on tools or toggle
+      if (e.target.closest('.rowtools') || e.target.closest('.toggle') || e.target.closest('.icon')) return;
+      
+      // Toggle highlighting for this category
+      if (state.highlightedCategory === p) {
+        state.highlightedCategory = null; // Remove highlight
+      } else {
+        state.highlightedCategory = p; // Set highlight
+      }
+      
+      if (onStateChange) onStateChange(); // Trigger full dashboard update
+    }
+    
+    // Add visual feedback for highlighted category
+    if (state.highlightedCategory === p) {
+      trP.style.background = 'rgba(59, 130, 246, 0.2)';
+      trP.style.borderLeft = '4px solid #3b82f6';
+    }
     const tools=document.createElement('span'); tools.className='rowtools'
     const tag=document.createElement('span'); tag.className='chip'; tag.textContent=(state.tags[p]==='F'?'Fixed':'Variable'); tag.title='Toggle Fixed/Variable'
     tag.onclick=()=>{ state.tags[p]=(state.tags[p]==='F'?'V':'F'); if(onStateChange) onStateChange(); }

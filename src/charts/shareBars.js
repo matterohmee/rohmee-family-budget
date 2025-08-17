@@ -12,10 +12,38 @@ export function drawShareBars(state, key){
   const n=arr.length, rw=innerH/n*0.75
   arr.forEach((e,i)=>{
     const y=padT + i*(innerH/n) + (innerH/n-rw)/2, w=(e.v/total)*innerW
-    const r=ns('rect'); r.setAttribute('x',padL); r.setAttribute('y',y); r.setAttribute('width',w); r.setAttribute('height',rw); r.setAttribute('fill','#3b82f6'); svg.appendChild(r)
+    
+    // Determine color based on highlighting
+    const isHighlighted = state.highlightedCategory === e.p
+    const barColor = isHighlighted ? '#f59e0b' : '#3b82f6' // Orange for highlighted, blue for normal
+    const barOpacity = state.highlightedCategory && !isHighlighted ? 0.3 : 1 // Dim non-highlighted when something is highlighted
+    
+    const r=ns('rect'); 
+    r.setAttribute('x',padL); 
+    r.setAttribute('y',y); 
+    r.setAttribute('width',w); 
+    r.setAttribute('height',rw); 
+    r.setAttribute('fill',barColor);
+    r.setAttribute('opacity',barOpacity);
+    
+    // Add glow effect for highlighted category
+    if (isHighlighted) {
+      r.setAttribute('filter', 'drop-shadow(0 0 8px rgba(245, 158, 11, 0.6))');
+    }
+    
+    svg.appendChild(r)
+    
+    // Adjust text opacity for highlighting
+    const textOpacity = state.highlightedCategory && !isHighlighted ? 0.5 : 1
+    
     const lab=(state.icons[e.p]||'')+' '+e.p
-    svg.appendChild(text(padL-16, y+rw/2+6, lab, 'end', '#cbd5e1', 15))
-    svg.appendChild(text(padL + w + 12, y+rw/2+6, ((e.v/total)*100).toFixed(1)+'%  ·  '+fmt(real(state,e.v))+' SEK', 'start', '#cbd5e1', 14))
+    const labelText = text(padL-16, y+rw/2+6, lab, 'end', '#cbd5e1', 15)
+    labelText.setAttribute('opacity', textOpacity)
+    svg.appendChild(labelText)
+    
+    const valueText = text(padL + w + 12, y+rw/2+6, ((e.v/total)*100).toFixed(1)+'%  ·  '+fmt(real(state,e.v))+' SEK', 'start', '#cbd5e1', 14)
+    valueText.setAttribute('opacity', textOpacity)
+    svg.appendChild(valueText)
   })
   const ax=ns('line'); ax.setAttribute('x1',padL); ax.setAttribute('x2',padL); ax.setAttribute('y1',padT); ax.setAttribute('y2',padT+innerH); ax.setAttribute('stroke','#243049'); svg.appendChild(ax)
 }
