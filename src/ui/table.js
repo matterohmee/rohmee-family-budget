@@ -12,13 +12,25 @@ export function renderTable(state, onStateChange){
 
   parents.forEach(p=>{
     const bPar = sumObj(m.budget[p]||{}), aPar=sumObj(m.actual[p]||{})
-    const trP = document.createElement('tr'); trP.className='parent' + (aPar>bPar? ' over':'')
+    const trP = document.createElement('tr'); 
+    trP.className='parent' + (aPar>bPar? ' over':'')
+    
+    // Add highlighting for selected category
+    if(state.highlightedCategory && p === state.highlightedCategory) {
+      trP.style.backgroundColor = 'rgba(59, 130, 246, 0.2)'
+      trP.style.borderLeft = '4px solid #3b82f6'
+    }
+    
     const td0 = document.createElement('td')
     const toggle=document.createElement('span'); toggle.textContent=(expandState[p]?'▾':'▸'); toggle.className='toggle'; toggle.title='Collapse/expand'
     toggle.onclick=()=>{ expandState[p]=!expandState[p]; renderTable(state, onStateChange) }
     const ic=document.createElement('span'); ic.className='icon'; ic.textContent=state.icons[p]||''; ic.title='Click to set emoji'; ic.style.cursor='pointer'
     ic.onclick=()=>{ const nv=prompt('Set emoji for '+p+':', state.icons[p]||''); if(nv){ state.icons[p]=nv; if(onStateChange) onStateChange(); } }
     const name=document.createElement('span'); name.textContent=p; name.style.cursor='pointer'
+    name.onclick = () => {
+      state.highlightedCategory = state.highlightedCategory === p ? null : p // Toggle highlighting
+      if(onStateChange) onStateChange()
+    }
     name.ondblclick=()=>{
       const nn=prompt('Rename parent:', p); if(!nn || MODEL[nn]) return;
       MODEL[nn]=MODEL[p]; delete MODEL[p]

@@ -14,9 +14,11 @@ import { drawBAvsParents } from './charts/baParents.js'
 import { drawHeatmap } from './charts/heatmap.js'
 import { drawBridge } from './charts/bridge.js'
 import { drawSpendingTrends } from './charts/spendingTrends.js'
+import { drawMonthlyTrends } from './charts/monthlyTrends.js'
 
 // App state (mutable)
 export let state = loadState()
+state.highlightedCategory = null // New state variable for highlighting
 
 // ---------- Layout ----------
 const app = document.getElementById('app')
@@ -29,18 +31,18 @@ app.innerHTML = `
       <div class="subpanel grid2">
         <div>
           <div class="legend"><span><i class="sw" style="background:#34d399"></i>YTD Savings vs Year Target</span></div>
-          <svg id="ytdGauge" class="chart tiny" viewBox="0 0 760 300" aria-label="YTD gauge"></svg>
+          <svg id="ytdGauge" class="chart tiny" viewBox="0 0 760 450" aria-label="YTD gauge"></svg>
         </div>
         <div>
           <div class="legend"><span><i class="sw" style="background:#06b6d4"></i>Fixed vs Variable (donut)</span></div>
-          <svg id="fixedVarMini" class="chart tiny" viewBox="0 0 760 300" aria-label="Fixed vs Variable donut"></svg>
+          <svg id="fixedVarMini" class="chart tiny" viewBox="0 0 760 450" aria-label="Fixed vs Variable donut"></svg>
         </div>
       </div>
 
       <div class="subpanel" style="position:relative">
         <div class="legend"><span><i class="sw" style="background:#f59e0b"></i>Glidepath — required per month to hit target</span></div>
         <div id="glidePill" class="pill"></div>
-        <svg id="glidepath" class="chart small" viewBox="0 0 760 320" aria-label="Glidepath"></svg>
+        <svg id="glidepath" class="chart small" viewBox="0 0 600 250" aria-label="Glidepath"></svg>
       </div>
 
       <div class="subpanel">
@@ -52,6 +54,13 @@ app.innerHTML = `
 
   <div class="panel">
     <div id="insightsPanel" class="insights-panel"></div>
+  </div>
+
+  <div class="panel">
+    <div class="legend">
+      <span><i class="sw" style="background:#3b82f6"></i>Monthly Income vs. Expenses Over Time</span>
+    </div>
+    <svg id="monthlyTrends" class="chart" viewBox="0 0 1200 400" aria-label="Monthly Income vs. Expenses Over Time"></svg>
   </div>
 
   <div class="panel">
@@ -148,9 +157,12 @@ function renderKPIs(st, key){
     const card = document.createElement('div')
     card.className='kpi'
     card.innerHTML = `<div class="lab">${it.lab}</div><div class="val">${it.val}</div>`
+    card.onclick = () => {
+      state.highlightedCategory = it.lab // Set highlighted category
+      onStateChange() // Trigger full dashboard update
+    }
     kpi.appendChild(card)
-  })
-}
+  })}
 
 function drawAll(){
   const key = document.getElementById('monthSel').value
@@ -159,11 +171,10 @@ function drawAll(){
   drawGlidepath(state, key)
   drawTotalsBar(state, key)
   drawSpendingTrends(state, key)
-  drawShareBars(state, key)
-  drawBAvsParents(state, key)
-  drawHeatmap(state, key)
-  drawBridge(state, key)
-  renderTable(state, onStateChange)
-}
+  drawMonthlyTrends(state, key);
+  drawShareBars(state, key);
+  drawBAvsParents(state, key);
+  drawHeatmap(state, key);
+  drawBridge(state, key);}
 
 function fmt(n){ return (Math.round(n)).toLocaleString('sv-SE') }

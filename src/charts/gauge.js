@@ -56,29 +56,29 @@ export function drawGauge(state, key) {
   // MASSIVE CARD-STYLE LAYOUT - HUGE fonts and larger dimensions
   
   // ENORMOUS percentage display - center top - MUCH LARGER
-  const percentText = text(380, 120, '0%', 'middle', '#10b981', 120, '900')
+  const percentText = text(380, 150, `${Math.round(pct * 100)}%`, 'middle', '#10b981', 200, '900')
   svg.appendChild(percentText)
   
   // LARGE amount display - center - MUCH LARGER
-  const amountText = text(380, 180, `${fmt(real(state, ytdSav))} SEK`, 'middle', '#f8fafc', 48, '700')
+  const amountText = text(380, 240, `${fmt(real(state, ytdSav))} SEK`, 'middle', '#f8fafc', 80, '700')
   svg.appendChild(amountText)
   
   // Target context - below amount - LARGER
-  const targetText = text(380, 220, `of ${fmt(real(state, target))} SEK target`, 'middle', '#94a3b8', 32, '500')
+  const targetText = text(380, 290, `of ${fmt(real(state, target))} SEK target`, 'middle', '#94a3b8', 50, '500')
   svg.appendChild(targetText)
   
   // Status indicator with large icon - LARGER
   const statusColor = pct >= 1 ? '#10b981' : pct >= 0.8 ? '#f59e0b' : '#ef4444'
   const statusText = pct >= 1 ? '✓ Target Achieved' : pct >= 0.8 ? '⚡ On Track' : '⚠ Behind Target'
   
-  const status = text(380, 260, statusText, 'middle', statusColor, 36, '600')
+  const status = text(380, 350, statusText, 'middle', statusColor, 50, '600')
   svg.appendChild(status)
   
   // LARGER progress bar - much more prominent
-  const barWidth = 400
-  const barHeight = 20
+  const barWidth = 500
+  const barHeight = 30
   const barX = 380 - barWidth/2
-  const barY = 280
+  const barY = 380
   
   // Background bar
   const bgBar = ns('rect')
@@ -111,10 +111,10 @@ export function drawGauge(state, key) {
   })
   
   // Progress percentage labels - LARGER
-  const progressLabels = ['0%', '25%', '50%', '75%', '100%']
+  const progressLabels = ["0%", "25%", "50%", "75%", "100%"]
   progressLabels.forEach((label, i) => {
     const x = barX + (barWidth * i / 4)
-    const labelEl = text(x, barY + 40, label, 'middle', '#64748b', 18, '500')
+    const labelEl = text(x, barY + 60, label, "middle", "#64748b", 30, "500")
     svg.appendChild(labelEl)
   })
   

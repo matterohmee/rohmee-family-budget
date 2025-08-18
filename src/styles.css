@@ -109,7 +109,6 @@ h4 { font-size: 1.25rem; } /* Increased from 1.125rem */
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
-
 /* Main Layout */
 #app {
   padding: var(--pad);
@@ -120,12 +119,13 @@ h4 { font-size: 1.25rem; } /* Increased from 1.125rem */
   min-height: calc(100vh - 80px);
 }
 
-/* Panel Styles */
-.panel {
-  background: var(--panel);
-  backdrop-filter: blur(20px);
-  border: 1px solid var(--panel-border);
-  border-radius: var(--radius);
+/* Controls Area */
+.controlsArea {
+  display: grid;
+  grid-template-columns: 420px 1fr;
+  gap: var(--gap);
+  align-items: start;
+}border-radius: var(--radius);
   padding: var(--pad);
   box-shadow: var(--shadow-lg);
   transition: all var(--transition-normal);
@@ -403,7 +403,7 @@ svg.chart {
   transition: all var(--transition-normal);
 }
 
-.chart.small { height: 450px; } /* Increased from 320px */
+.chart.small { height: 250px; } /* Increased from 320px */
 .chart.tiny { height: 400px; } /* Increased from 300px */
 .chart.tall { height: 800px; } /* Increased from 700px */
 
@@ -591,3 +591,11 @@ svg .legend-text {
   font-size: 14px !important; /* Larger for legend text */
   font-weight: 500;
 }
+
+
+.feedback-icon {
+  margin-left: 8px;
+  font-size: 1.2em;
+  vertical-align: middle;
+}
+

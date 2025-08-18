@@ -111,7 +111,7 @@ export function drawSpendingTrends(state, key) {
     
     // Y-axis labels
     const value = maxSpending - (maxSpending / 5) * i
-    const label = text(margin.left - 10, y + 4, fmt(value), 'end', '#94a3b8', 10)
+    const label = text(margin.left - 10, y + 4, fmt(value), 'end', '#94a3b8', 14)
     svg.appendChild(label)
   }
   
@@ -181,7 +181,7 @@ export function drawSpendingTrends(state, key) {
     svg.appendChild(point)
     
     // X-axis labels
-    const xLabel = text(x, margin.top + chartHeight + 20, month.label, 'middle', '#94a3b8', 10)
+    const xLabel = text(x, margin.top + chartHeight + 20, month.label, 'middle', '#94a3b8', 14)
     svg.appendChild(xLabel)
     
     // Add hover effects

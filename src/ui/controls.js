@@ -11,15 +11,18 @@ export function renderControls(state, onChange){
       </div>
       <div>
         <label>Net Income (SEK)</label>
-        <input id="netIncome" type="number" step="500" value="${state.months[current].income || 0}">
+        <input id="netIncome" type="text" inputmode="numeric" value="${fmt(state.months[current].income || 0)}">
+        <span id="netIncomeFeedback" class="feedback-icon"></span>
       </div>
       <div>
         <label>Yearly Savings Target (SEK)</label>
-        <input id="savTarget" type="number" step="10000" value="${state.target}">
+        <input id="savTarget" type="text" inputmode="numeric" value="${fmt(state.target)}">
+        <span id="savTargetFeedback" class="feedback-icon"></span>
       </div>
       <div>
         <label>CPI factor (real SEK toggle)</label>
         <input id="cpiFactor" type="number" step="0.01" value="${state.cpi}">
+        <span id="cpiFactorFeedback" class="feedback-icon"></span>
       </div>
       <div class="row">
         <button class="btn ghost" id="exportCSV">Export CSV</button>
@@ -33,14 +36,64 @@ export function renderControls(state, onChange){
   const sel = c.querySelector('#monthSel')
   state.order.forEach(k=>{ const o=document.createElement('option'); o.value=k; o.textContent=k; sel.appendChild(o) })
   sel.value = current
+  const netInput = c.querySelector("#netIncome")
+  const savInput = c.querySelector("#savTarget")
+  const cpiInput = c.querySelector("#cpiFactor")
 
-  const netInput = c.querySelector('#netIncome')
-  sel.addEventListener('change', e=>{ netInput.value = state.months[sel.value].income || 0; onChange() })
-  netInput.addEventListener('input', e=>{ state.months[sel.value].income = +e.target.value||0; onChange() })
-  c.querySelector('#savTarget').addEventListener('input', e=>{ state.target=+e.target.value||0; onChange() })
-  c.querySelector('#cpiFactor').addEventListener('input', e=>{ state.cpi=+e.target.value||1; onChange() })
+  function fmt(n) { return (Math.round(n)).toLocaleString("sv-SE") }
+  function parseFormattedNumber(s) { return parseFloat(s.replace(/\s/g, "").replace(",", ".")) || 0 }
 
-  c.querySelector('#saveJSON').addEventListener('click', ()=>exportJSON(state))
+  sel.addEventListener("change", e => {
+    netInput.value = fmt(state.months[sel.value].income || 0)
+    savInput.value = fmt(state.target)
+    cpiInput.value = state.cpi
+    onChange()
+  })
+
+  netInput.addEventListener("input", e => {
+    const rawValue = e.target.value.replace(/\s/g, "")
+    const numValue = parseFormattedNumber(rawValue)
+    if (!isNaN(numValue)) {
+      state.months[sel.value].income = numValue
+      e.target.value = fmt(numValue)
+      document.getElementById("netIncomeFeedback").innerHTML = '&#10004;' // Checkmark
+      document.getElementById("netIncomeFeedback").style.color = "green"
+    } else {
+      document.getElementById("netIncomeFeedback").innerHTML = '&#10060;' // Cross mark
+      document.getElementById("netIncomeFeedback").style.color = "red"
+    }
+    onChange()
+  })
+
+  savInput.addEventListener("input", e => {
+    const rawValue = e.target.value.replace(/\s/g, "")
+    const numValue = parseFormattedNumber(rawValue)
+    if (!isNaN(numValue)) {
+      state.target = numValue
+      e.target.value = fmt(numValue)
+      document.getElementById("savTargetFeedback").innerHTML = '&#10004;'
+      document.getElementById("savTargetFeedback").style.color = "green"
+    } else {
+      document.getElementById("savTargetFeedback").innerHTML = '&#10060;'
+      document.getElementById("savTargetFeedback").style.color = "red"
+    }
+    onChange()
+  })
+
+  cpiInput.addEventListener("input", e => {
+    const numValue = parseFloat(e.target.value)
+    if (!isNaN(numValue)) {
+      state.cpi = numValue
+      document.getElementById("cpiFactorFeedback").innerHTML = '&#10004;'
+      document.getElementById("cpiFactorFeedback").style.color = "green"
+    } else {
+      document.getElementById("cpiFactorFeedback").innerHTML = '&#10060;'
+      document.getElementById("cpiFactorFeedback").style.color = "red"
+    }
+    onChange()
+  })
+
+  c.querySelector("#saveJSON").addEventListener("click", () => exportJSON(state))
   c.querySelector('#loadJsonInput').addEventListener('change', e=>{ const f=e.target.files[0]; if(f) importJSON(f, st=>{ Object.assign(state, st); onChange() }) })
   c.querySelector('#exportCSV').addEventListener('click', ()=>{
     const rows = [['Month','Parent','Sub','Budget','Actual']]

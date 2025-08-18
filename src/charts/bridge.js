@@ -5,7 +5,7 @@ const text=(x,y,t,anchor='start',fill='#cbd5e1',fs=12)=>{const el=ns('text');el.
 
 export function drawBridge(state, key){
   const svg=document.getElementById('bridge'); while(svg.firstChild) svg.removeChild(svg.firstChild)
-  const prev=prevMonthKey(state,key); if(!prev){ svg.appendChild(text(600,210,'No previous month to compare.','middle','#9aa3b2',14)); return }
+  const prev=prevMonthKey(state,key); if(!prev){ svg.appendChild(text(600,210,'No previous month to compare.','middle','#9aa3b2',18)); return }
   const W=1200,H=420,padL=80,padR=40,padT=30,padB=60,innerW=W-padL-padR,innerH=H-padT-padB
   const cur=monthTotals(state,key), last=monthTotals(state,prev)
   const start=last.aTotal, end=cur.aTotal
@@ -16,18 +16,31 @@ export function drawBridge(state, key){
   let x=padL+xStep
   function yScale(v){ const maxV=Math.max(start,end, Math.max(...topN.map(d=>Math.abs(d.delta))) + Math.max(start,end)); return padT+innerH-(v/maxV)*innerH }
   const sRect=ns('rect'); sRect.setAttribute('x', x-24); sRect.setAttribute('y', yScale(start)); sRect.setAttribute('width', 48); sRect.setAttribute('height', baseY - yScale(start)); sRect.setAttribute('fill','#64748b'); svg.appendChild(sRect)
-  svg.appendChild(text(x, H-18, 'Start', 'middle', '#9aa3b2', 12)); svg.appendChild(text(x, yScale(start)-6, fmt(real(state,start)), 'middle', '#cbd5e1', 12))
+  svg.appendChild(text(x, H-18, 'Start', 'middle', '#9aa3b2', 16)); svg.appendChild(text(x, yScale(start)-6, fmt(real(state,start)), 'middle', '#cbd5e1', 16))
   let running=start; x+=xStep
   topN.forEach(d=>{
     const v=d.delta, up=v>=0
     const y0=yScale(running), y1=yScale(running+v), y=Math.min(y0,y1), h=Math.abs(y1-y0)
-    const r=ns('rect'); r.setAttribute('x', x-24); r.setAttribute('y', y); r.setAttribute('width', 48); r.setAttribute('height', h); r.setAttribute('fill', up? '#ef4444' : '#10b981'); svg.appendChild(r)
-    const name=((d.icon? d.icon+' ':'')+d.p); svg.appendChild(text(x, H-18, name.length>14? name.slice(0,14)+'…':name, 'middle', '#9aa3b2', 12))
-    const mid=(up? '+':'') + fmt(real(state,v)); svg.appendChild(text(x, y-6, mid, 'middle', '#cbd5e1', 12))
+    
+    // Determine color and opacity based on highlighting
+    let fillColor = up ? '#ef4444' : '#10b981'
+    let opacity = 1
+    if(state.highlightedCategory) {
+      if(d.p === state.highlightedCategory) {
+        fillColor = up ? '#dc2626' : '#059669' // Brighter for highlighted
+        opacity = 1
+      } else {
+        opacity = 0.3 // Fade non-highlighted categories
+      }
+    }
+    
+    const r=ns('rect'); r.setAttribute('x', x-24); r.setAttribute('y', y); r.setAttribute('width', 48); r.setAttribute('height', h); r.setAttribute('fill', fillColor); r.setAttribute('opacity', opacity); svg.appendChild(r)
+    const name=((d.icon? d.icon+' ':'')+d.p); svg.appendChild(text(x, H-18, name.length>14? name.slice(0,14)+'…':name, 'middle', state.highlightedCategory === d.p ? '#ffffff' : '#9aa3b2', 16))
+    const mid=(up? '+':'') + fmt(real(state,v)); svg.appendChild(text(x, y-6, mid, 'middle', state.highlightedCategory === d.p ? '#ffffff' : '#cbd5e1', 16))
     running += v; x+=xStep
   })
   const eRect=ns('rect'); eRect.setAttribute('x', x-24); eRect.setAttribute('y', yScale(end)); eRect.setAttribute('width', 48); eRect.setAttribute('height', baseY - yScale(end)); eRect.setAttribute('fill','#64748b'); svg.appendChild(eRect)
-  svg.appendChild(text(x, H-18, 'End', 'middle', '#9aa3b2', 12)); svg.appendChild(text(x, yScale(end)-6, fmt(real(state,end)), 'middle', '#cbd5e1', 12))
+  svg.appendChild(text(x, H-18, 'End', 'middle', '#9aa3b2', 16)); svg.appendChild(text(x, yScale(end)-6, fmt(real(state,end)), 'middle', '#cbd5e1', 16))
   const axis=ns('line'); axis.setAttribute('x1', padL*0.6); axis.setAttribute('x2', W-padR); axis.setAttribute('y1', baseY); axis.setAttribute('y2', baseY); axis.setAttribute('stroke','#243049'); svg.appendChild(axis)
 }
 function fmt(n){ return (Math.round(n)).toLocaleString('sv-SE') }
