@@ -55,23 +55,23 @@ export function drawGauge(state, key) {
   
   // MASSIVE CARD-STYLE LAYOUT - HUGE fonts and larger dimensions
   
-  // ENORMOUS percentage display - center top - MUCH LARGER
-  const percentText = text(380, 150, `${Math.round(pct * 100)}%`, 'middle', '#10b981', 200, '900')
+  // ENORMOUS percentage display - center top - REDUCED SIZE
+  const percentText = text(380, 150, `${Math.round(pct * 100)}%`, 'middle', '#10b981', 80, '900')
   svg.appendChild(percentText)
   
-  // LARGE amount display - center - MUCH LARGER
-  const amountText = text(380, 240, `${fmt(real(state, ytdSav))} SEK`, 'middle', '#f8fafc', 80, '700')
+  // LARGE amount display - center - REDUCED SIZE
+  const amountText = text(380, 240, `${fmt(real(state, ytdSav))} SEK`, 'middle', '#f8fafc', 32, '700')
   svg.appendChild(amountText)
   
-  // Target context - below amount - LARGER
-  const targetText = text(380, 290, `of ${fmt(real(state, target))} SEK target`, 'middle', '#94a3b8', 50, '500')
+  // Target context - below amount - REDUCED SIZE
+  const targetText = text(380, 290, `of ${fmt(real(state, target))} SEK target`, 'middle', '#94a3b8', 20, '500')
   svg.appendChild(targetText)
   
-  // Status indicator with large icon - LARGER
+  // Status indicator with large icon - REDUCED SIZE
   const statusColor = pct >= 1 ? '#10b981' : pct >= 0.8 ? '#f59e0b' : '#ef4444'
   const statusText = pct >= 1 ? '✓ Target Achieved' : pct >= 0.8 ? '⚡ On Track' : '⚠ Behind Target'
   
-  const status = text(380, 350, statusText, 'middle', statusColor, 50, '600')
+  const status = text(380, 350, statusText, 'middle', statusColor, 24, '600')
   svg.appendChild(status)
   
   // LARGER progress bar - much more prominent

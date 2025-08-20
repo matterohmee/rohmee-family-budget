@@ -63,31 +63,31 @@ export function drawFixedVar(state, key) {
   // Fixed Expenses Section (Left Side)
   const fixedX = 200
   
-  // ENORMOUS Fixed percentage - MUCH LARGER
-  const fixedPercentText = text(fixedX, 150, '0%', 'middle', '#8b5cf6', 160, '900')
+  // ENORMOUS Fixed percentage - REDUCED SIZE
+  const fixedPercentText = text(fixedX, 150, '0%', 'middle', '#8b5cf6', 60, '900')
   svg.appendChild(fixedPercentText)
   
-  // Fixed label - LARGER
-  const fixedLabelText = text(fixedX, 220, 'Fixed Expenses', 'middle', '#8b5cf6', 50, '600')
+  // Fixed label - REDUCED SIZE
+  const fixedLabelText = text(fixedX, 220, 'Fixed Expenses', 'middle', '#8b5cf6', 20, '600')
   svg.appendChild(fixedLabelText)
   
-  // Fixed amount - LARGER
-  const fixedAmountText = text(fixedX, 280, `${fmt(real(state, fixed))} SEK`, 'middle', '#a78bfa', 40, '500')
+  // Fixed amount - REDUCED SIZE
+  const fixedAmountText = text(fixedX, 280, `${fmt(real(state, fixed))} SEK`, 'middle', '#a78bfa', 16, '500')
   svg.appendChild(fixedAmountText)
   
   // Variable Expenses Section (Right Side)
   const variableX = 560
   
-  // ENORMOUS Variable percentage - MUCH LARGER
-  const variablePercentText = text(variableX, 150, '0%', 'middle', '#06b6d4', 160, '900')
+  // ENORMOUS Variable percentage - REDUCED SIZE
+  const variablePercentText = text(variableX, 150, '0%', 'middle', '#06b6d4', 60, '900')
   svg.appendChild(variablePercentText)
   
-  // Variable label - LARGER
-  const variableLabelText = text(variableX, 220, 'Variable Expenses', 'middle', '#06b6d4', 50, '600')
+  // Variable label - REDUCED SIZE
+  const variableLabelText = text(variableX, 220, 'Variable Expenses', 'middle', '#06b6d4', 20, '600')
   svg.appendChild(variableLabelText)
   
-  // Variable amount - LARGER
-  const variableAmountText = text(variableX, 280, `${fmt(real(state, variable))} SEK`, 'middle', '#67e8f9', 40, '500')
+  // Variable amount - REDUCED SIZE
+  const variableAmountText = text(variableX, 280, `${fmt(real(state, variable))} SEK`, 'middle', '#67e8f9', 16, '500')
   svg.appendChild(variableAmountText)
   
   // LARGER comparison bars at the bottom

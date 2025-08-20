@@ -6,7 +6,17 @@ const text=(x,y,t,anchor='start',fill='#cbd5e1',fs=12)=>{const el=ns('text');el.
 export function drawHeatmap(state, key){
   const svg=document.getElementById('heatmapVar'); while(svg.firstChild) svg.removeChild(svg.firstChild)
   const W=1200,H=440,padL=260,padR=40,padT=20,padB=40,innerW=W-padL-padR,innerH=H-padT-padB
-  const year=key.slice(0,4), months=state.order.filter(k=>k.slice(0,4)===year)
+  const year=key.slice(0,4)
+  
+  // Filter months to start from September (09) and go through August of next year
+  const allMonths = state.order.filter(k=>k.slice(0,4)===year || k.slice(0,4)===(parseInt(year)+1).toString())
+  const months = allMonths.filter(mk => {
+    const month = parseInt(mk.slice(5,7))
+    const mkYear = mk.slice(0,4)
+    // Include months 09-12 from current year and 01-08 from next year
+    return (mkYear === year && month >= 9) || (mkYear === (parseInt(year)+1).toString() && month <= 8)
+  }).slice(0, 12) // Limit to 12 months
+  
   const rows=Object.keys(MODEL), cols=months.length
   const matrix=[], vals=[]
   rows.forEach(p=>{

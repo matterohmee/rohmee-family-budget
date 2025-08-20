@@ -240,7 +240,7 @@ h4 { font-size: 1.25rem; } /* Increased from 1.125rem */
 /* Controls Area */
 .controlsArea {
   display: grid;
-  grid-template-columns: 420px 1fr;
+  grid-template-columns: 300px 1fr; /* REDUCED from 420px to make controls area smaller */
   gap: var(--gap);
   align-items: start;
 }
@@ -404,7 +404,7 @@ svg.chart {
 }
 
 .chart.small { height: 250px; } /* Increased from 320px */
-.chart.tiny { height: 400px; } /* Increased from 300px */
+.chart.tiny { height: 200px; } /* REDUCED from 400px to make red cross area smaller */
 .chart.tall { height: 800px; } /* Increased from 700px */
 
 svg.chart:hover {
