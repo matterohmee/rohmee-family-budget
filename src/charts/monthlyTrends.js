@@ -48,8 +48,12 @@ export function drawMonthlyTrends(state, key) {
     return { month: monthKey, income: income, expenses: expenses }
   })
 
-  const maxVal = Math.max(...data.map(d => Math.max(d.income, d.expenses)))
-  const minVal = Math.min(0, ...data.map(d => Math.min(d.income, d.expenses)))
+  // Ensure we have valid data to prevent NaN issues
+  const validData = data.filter(d => !isNaN(d.income) && !isNaN(d.expenses))
+  if (validData.length === 0) return
+
+  const maxVal = Math.max(1, ...validData.map(d => Math.max(d.income, d.expenses)))
+  const minVal = Math.min(0, ...validData.map(d => Math.min(d.income, d.expenses)))
 
   const yScale = (val) => padT + innerH - ((val - minVal) / (maxVal - minVal)) * innerH
   const xScale = (idx) => padL + (idx / (months.length - 1)) * innerW

@@ -6,15 +6,30 @@ const text = (x,y,t,anchor='start',fill='#cbd5e1',fs=12)=>{const el=ns('text');e
 export function drawGlidepath(state, key){
   const svg=document.getElementById('glidepath'); while(svg.firstChild) svg.removeChild(svg.firstChild)
   const W=600,H=250,padL=50,padR=20,padT=20,padB=40,innerW=W-padL-padR,innerH=H-padT-padB
-  const year=key.slice(0,4), months=state.order.filter(k=>k.slice(0,4)===year)
-  const idx=state.order.indexOf(key), past=state.order.filter(k=>k.slice(0,4)===year && state.order.indexOf(k)<=idx)
-  const ytdSav=past.map(mk=>Math.max(0, (state.months[mk].income||0) - monthTotals(state,mk).aTotal)).reduce((a,b)=>a+b,0)
+  
+  // Create rolling 12-month sequence starting from September (09) - SAME AS OTHER CHARTS
+  const year = key.slice(0,4)
+  const months = []
+  // Add months 09-12 from current year
+  for(let m = 9; m <= 12; m++) {
+    const monthKey = `${year}-${m.toString().padStart(2, '0')}`
+    months.push(monthKey)
+  }
+  // Add months 01-08 from next year
+  const nextYear = (parseInt(year) + 1).toString()
+  for(let m = 1; m <= 8; m++) {
+    const monthKey = `${nextYear}-${m.toString().padStart(2, '0')}`
+    months.push(monthKey)
+  }
+  
+  const idx=state.order.indexOf(key), past=months.filter(k=>state.order.indexOf(k)<=idx && state.order.indexOf(k)>=0)
+  const ytdSav=past.map(mk=>Math.max(0, ((state.months[mk] && state.months[mk].income)||0) - (state.months[mk] ? monthTotals(state,mk).aTotal : 0))).reduce((a,b)=>a+b,0)
   const rem=12 - past.length, remaining=Math.max(0,(state.target||0)-ytdSav), req = rem>0? remaining/rem : 0
   const mTarget=(state.target||0)/12
   const series=[]
   months.forEach(mk=>{
-    if(state.order.indexOf(mk)<=idx){
-      series.push({m:mk, v:Math.max(0, (state.months[mk].income||0) - monthTotals(state,mk).aTotal), t:'a'})
+    if(state.order.indexOf(mk)<=idx && state.order.indexOf(mk)>=0){
+      series.push({m:mk, v:Math.max(0, ((state.months[mk] && state.months[mk].income)||0) - (state.months[mk] ? monthTotals(state,mk).aTotal : 0)), t:'a'})
     }else{
       series.push({m:mk, v:req, t:'r'})
     }
