@@ -23,12 +23,28 @@ export function drawMonthlyTrends(state, key) {
   const innerW = W - padL - padR
   const innerH = H - padT - padB
 
-  const months = state.order
+  // Create rolling 12-month sequence starting from September (09) - ALWAYS SHOW ALL 12 MONTHS
+  const year = key.slice(0,4)
+  const allMonths = state.order.filter(k=>k.slice(0,4)===year || k.slice(0,4)===(parseInt(year)+1).toString())
+  
+  const months = []
+  // Add months 09-12 from current year
+  for(let m = 9; m <= 12; m++) {
+    const monthKey = `${year}-${m.toString().padStart(2, '0')}`
+    months.push(monthKey) // Always add, even if no data
+  }
+  // Add months 01-08 from next year
+  const nextYear = (parseInt(year) + 1).toString()
+  for(let m = 1; m <= 8; m++) {
+    const monthKey = `${nextYear}-${m.toString().padStart(2, '0')}`
+    months.push(monthKey) // Always add, even if no data
+  }
+
   if (months.length === 0) return
 
   const data = months.map(monthKey => {
-    const income = state.months[monthKey].income || 0
-    const expenses = monthTotals(state, monthKey).aTotal
+    const income = (state.months[monthKey] && state.months[monthKey].income) || 0
+    const expenses = state.months[monthKey] ? monthTotals(state, monthKey).aTotal : 0
     return { month: monthKey, income: income, expenses: expenses }
   })
 

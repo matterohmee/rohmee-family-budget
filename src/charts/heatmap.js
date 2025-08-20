@@ -8,14 +8,22 @@ export function drawHeatmap(state, key){
   const W=1200,H=440,padL=260,padR=40,padT=20,padB=40,innerW=W-padL-padR,innerH=H-padT-padB
   const year=key.slice(0,4)
   
-  // Filter months to start from September (09) and go through August of next year
+  // Filter months to start from September (09) and go through August of next year - ROLLING 12 MONTHS
   const allMonths = state.order.filter(k=>k.slice(0,4)===year || k.slice(0,4)===(parseInt(year)+1).toString())
-  const months = allMonths.filter(mk => {
-    const month = parseInt(mk.slice(5,7))
-    const mkYear = mk.slice(0,4)
-    // Include months 09-12 from current year and 01-08 from next year
-    return (mkYear === year && month >= 9) || (mkYear === (parseInt(year)+1).toString() && month <= 8)
-  }).slice(0, 12) // Limit to 12 months
+  
+  // Create rolling 12-month sequence starting from September - ALWAYS SHOW ALL 12 MONTHS
+  const months = []
+  // Add months 09-12 from current year
+  for(let m = 9; m <= 12; m++) {
+    const monthKey = `${year}-${m.toString().padStart(2, '0')}`
+    months.push(monthKey) // Always add, even if no data
+  }
+  // Add months 01-08 from next year
+  const nextYear = (parseInt(year) + 1).toString()
+  for(let m = 1; m <= 8; m++) {
+    const monthKey = `${nextYear}-${m.toString().padStart(2, '0')}`
+    months.push(monthKey) // Always add, even if no data
+  }
   
   const rows=Object.keys(MODEL), cols=months.length
   const matrix=[], vals=[]
