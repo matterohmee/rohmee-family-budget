@@ -7,19 +7,37 @@ export function drawGlidepath(state, key){
   const svg=document.getElementById('glidepath'); while(svg.firstChild) svg.removeChild(svg.firstChild)
   const W=600,H=250,padL=50,padR=20,padT=20,padB=40,innerW=W-padL-padR,innerH=H-padT-padB
   
-  // Create rolling 12-month sequence starting from September (09) - SAME AS OTHER CHARTS
+  // Create rolling 12-month sequence starting from September (09) - USE CURRENT YEAR DATA
   const year = key.slice(0,4)
+  const currentMonth = parseInt(key.slice(5,7))
+  
   const months = []
-  // Add months 09-12 from current year
-  for(let m = 9; m <= 12; m++) {
-    const monthKey = `${year}-${m.toString().padStart(2, '0')}`
-    months.push(monthKey)
-  }
-  // Add months 01-08 from next year
-  const nextYear = (parseInt(year) + 1).toString()
-  for(let m = 1; m <= 8; m++) {
-    const monthKey = `${nextYear}-${m.toString().padStart(2, '0')}`
-    months.push(monthKey)
+  // If we're in September or later, use current year for Sep-Dec and next year for Jan-Aug
+  // If we're before September, use previous year for Sep-Dec and current year for Jan-Aug
+  if (currentMonth >= 9) {
+    // Add months 09-12 from current year
+    for(let m = 9; m <= 12; m++) {
+      const monthKey = `${year}-${m.toString().padStart(2, '0')}`
+      months.push(monthKey)
+    }
+    // Add months 01-08 from next year
+    const nextYear = (parseInt(year) + 1).toString()
+    for(let m = 1; m <= 8; m++) {
+      const monthKey = `${nextYear}-${m.toString().padStart(2, '0')}`
+      months.push(monthKey)
+    }
+  } else {
+    // Add months 09-12 from previous year
+    const prevYear = (parseInt(year) - 1).toString()
+    for(let m = 9; m <= 12; m++) {
+      const monthKey = `${prevYear}-${m.toString().padStart(2, '0')}`
+      months.push(monthKey)
+    }
+    // Add months 01-08 from current year
+    for(let m = 1; m <= 8; m++) {
+      const monthKey = `${year}-${m.toString().padStart(2, '0')}`
+      months.push(monthKey)
+    }
   }
   
   const idx=state.order.indexOf(key), past=months.filter(k=>state.order.indexOf(k)<=idx && state.order.indexOf(k)>=0)

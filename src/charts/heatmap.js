@@ -6,23 +6,38 @@ const text=(x,y,t,anchor='start',fill='#cbd5e1',fs=12)=>{const el=ns('text');el.
 export function drawHeatmap(state, key){
   const svg=document.getElementById('heatmapVar'); while(svg.firstChild) svg.removeChild(svg.firstChild)
   const W=1200,H=440,padL=260,padR=40,padT=20,padB=40,innerW=W-padL-padR,innerH=H-padT-padB
-  const year=key.slice(0,4)
   
-  // Filter months to start from September (09) and go through August of next year - ROLLING 12 MONTHS
-  const allMonths = state.order.filter(k=>k.slice(0,4)===year || k.slice(0,4)===(parseInt(year)+1).toString())
+  // Create rolling 12-month sequence starting from September (09) - USE CURRENT YEAR DATA
+  const year = key.slice(0,4)
+  const currentMonth = parseInt(key.slice(5,7))
   
-  // Create rolling 12-month sequence starting from September - ALWAYS SHOW ALL 12 MONTHS
   const months = []
-  // Add months 09-12 from current year
-  for(let m = 9; m <= 12; m++) {
-    const monthKey = `${year}-${m.toString().padStart(2, '0')}`
-    months.push(monthKey) // Always add, even if no data
-  }
-  // Add months 01-08 from next year
-  const nextYear = (parseInt(year) + 1).toString()
-  for(let m = 1; m <= 8; m++) {
-    const monthKey = `${nextYear}-${m.toString().padStart(2, '0')}`
-    months.push(monthKey) // Always add, even if no data
+  // If we're in September or later, use current year for Sep-Dec and next year for Jan-Aug
+  // If we're before September, use previous year for Sep-Dec and current year for Jan-Aug
+  if (currentMonth >= 9) {
+    // Add months 09-12 from current year
+    for(let m = 9; m <= 12; m++) {
+      const monthKey = `${year}-${m.toString().padStart(2, '0')}`
+      months.push(monthKey)
+    }
+    // Add months 01-08 from next year
+    const nextYear = (parseInt(year) + 1).toString()
+    for(let m = 1; m <= 8; m++) {
+      const monthKey = `${nextYear}-${m.toString().padStart(2, '0')}`
+      months.push(monthKey)
+    }
+  } else {
+    // Add months 09-12 from previous year
+    const prevYear = (parseInt(year) - 1).toString()
+    for(let m = 9; m <= 12; m++) {
+      const monthKey = `${prevYear}-${m.toString().padStart(2, '0')}`
+      months.push(monthKey)
+    }
+    // Add months 01-08 from current year
+    for(let m = 1; m <= 8; m++) {
+      const monthKey = `${year}-${m.toString().padStart(2, '0')}`
+      months.push(monthKey)
+    }
   }
   
   const rows=Object.keys(MODEL), cols=months.length
