@@ -27,9 +27,9 @@ export function drawHeatmap(state, key){
     })
     matrix.push(r)
   })
-  const minV=Math.min(...vals,0), maxV=Math.max(...vals,0)
+  const minV=Math.min(...vals), maxV=Math.max(...vals)
   const cw=innerW/cols, ch=innerH/rows.length
-  function color(v){ const hue=v<=0?150:0; const t=Math.min(1, Math.abs(v)/(v<=0? -minV : maxV) || 0); const l=30+30*t; return `hsl(${hue},70%,${l}%)` }
+  function color(v){ const hue=v<=0?150:0; const divisor = v<=0? (minV === 0 ? 1 : -minV) : (maxV === 0 ? 1 : maxV); const t=Math.min(1, Math.abs(v)/divisor || 0); const l=30+30*t; return `hsl(${hue},70%,${l}%)` }
   matrix.forEach((row,ri)=>{
     row.forEach((cell,ci)=>{
       const r=ns('rect'); r.setAttribute('x', padL + ci*cw); r.setAttribute('y', padT + ri*ch); r.setAttribute('width', cw-2); r.setAttribute('height', ch-2); r.setAttribute('fill', color(cell.v))

@@ -12,23 +12,16 @@ export function loadState(){
       const st = JSON.parse(raw)
       st.version = st.version || 0
       migrate(st)
-      if(!st.order || !st.order.length) st.order = monthList(2025)
+      if(!st.order || !st.order.length) st.order = monthList(2025, 9)
       st.order.forEach(k => ensureMonth(st,k))
       st.icons = st.icons || DEFAULT_ICONS
       st.tags  = st.tags  || DEFAULT_TAGS
       return st
     }catch(e){ /* fallthrough to default */ }
   }
-  const st = { defaultIncome:DEFAULT_INCOME, target:250000, cpi:1.00, order:monthList(2025), months:{}, icons:DEFAULT_ICONS, tags:DEFAULT_TAGS, selected:null, version:VERSION }
+  const st = { defaultIncome:DEFAULT_INCOME, target:250000, cpi:1.00, order:monthList(2025, 9), months:{}, icons:DEFAULT_ICONS, tags:DEFAULT_TAGS, selected:null, version:VERSION }
   st.order.forEach(k => ensureMonth(st,k))
-  // seed first months with slight variance
-  ;['2025-01','2025-02','2025-03','2025-04','2025-05','2025-06','2025-07'].forEach(k=>{
-    const m = st.months[k]
-    Object.keys(m.actual).forEach(p=>Object.keys(m.actual[p]).forEach(s=>{
-      const base = m.budget[p][s]; const delta = (Math.random()*0.2-0.05)
-      m.actual[p][s] = Math.max(0, Math.round(base*(1+delta)))
-    }))
-  })
+
   saveState(st)
   return st
 }

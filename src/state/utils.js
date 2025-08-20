@@ -1,6 +1,20 @@
 import { MODEL } from './model.js'
 
-export function monthList(year){ const a=[]; for(let m=1;m<=12;m++) a.push(`${year}-${String(m).padStart(2,'0')}`); return a }
+export function monthList(year, startMonth = 1){
+  const a=[];
+  let currentMonth = startMonth;
+  let currentYear = year;
+  for(let i=0;i<12;i++){
+    a.push(`${currentYear}-${String(currentMonth).padStart(2,'0')}`);
+    currentMonth++;
+    if(currentMonth > 12){
+      currentMonth = 1;
+      currentYear++;
+    }
+  }
+  return a
+}
+
 export function ensureMonth(state, key){
   if(!state.months[key]){
     let b={},a={}
@@ -17,3 +31,5 @@ export function ensureMonth(state, key){
     if(state.months[key].income===undefined) state.months[key].income = state.defaultIncome || 0
   }
 }
+
+
