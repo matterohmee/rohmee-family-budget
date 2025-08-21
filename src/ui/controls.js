@@ -34,7 +34,52 @@ export function renderControls(state, onChange){
     </div>
   `
   const sel = c.querySelector('#monthSel')
-  state.order.forEach(k=>{ const o=document.createElement('option'); o.value=k; o.textContent=k; sel.appendChild(o) })
+  
+  // Create fiscal year ordered months starting from September
+  const currentMonth = current.slice(5, 7)
+  const currentYear = current.slice(0, 4)
+  
+  // Create rolling 12-month sequence starting from September
+  const fiscalYearOrder = []
+  
+  if (parseInt(currentMonth) >= 9) {
+    // If current month is Sep or later, show Sep-Dec of current year, then Jan-Aug of next year
+    for(let m = 9; m <= 12; m++) {
+      const monthKey = `${currentYear}-${m.toString().padStart(2, '0')}`
+      if(state.order.includes(monthKey)) fiscalYearOrder.push(monthKey)
+    }
+    const nextYear = (parseInt(currentYear) + 1).toString()
+    for(let m = 1; m <= 8; m++) {
+      const monthKey = `${nextYear}-${m.toString().padStart(2, '0')}`
+      if(state.order.includes(monthKey)) fiscalYearOrder.push(monthKey)
+    }
+  } else {
+    // If current month is before Sep, show Sep-Dec of previous year, then Jan-Aug of current year
+    const prevYear = (parseInt(currentYear) - 1).toString()
+    for(let m = 9; m <= 12; m++) {
+      const monthKey = `${prevYear}-${m.toString().padStart(2, '0')}`
+      if(state.order.includes(monthKey)) fiscalYearOrder.push(monthKey)
+    }
+    for(let m = 1; m <= 8; m++) {
+      const monthKey = `${currentYear}-${m.toString().padStart(2, '0')}`
+      if(state.order.includes(monthKey)) fiscalYearOrder.push(monthKey)
+    }
+  }
+  
+  // Add any remaining months that weren't included in fiscal year order
+  state.order.forEach(k => {
+    if (!fiscalYearOrder.includes(k)) {
+      fiscalYearOrder.push(k)
+    }
+  })
+  
+  // Populate dropdown with fiscal year ordered months
+  fiscalYearOrder.forEach(k => { 
+    const o = document.createElement('option'); 
+    o.value = k; 
+    o.textContent = k; 
+    sel.appendChild(o) 
+  })
   sel.value = current
   const netInput = c.querySelector("#netIncome")
   const savInput = c.querySelector("#savTarget")
