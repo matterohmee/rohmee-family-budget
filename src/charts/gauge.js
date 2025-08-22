@@ -43,11 +43,55 @@ export function drawGauge(state, key) {
   const svg = document.getElementById('ytdGauge')
   while (svg.firstChild) svg.removeChild(svg.firstChild)
   
-  const year = key.slice(0, 4)
-  const months = state.order.filter(k => k.slice(0, 4) === year && k <= key)
-  const ytdSav = months.map(mk => Math.max(0, (state.months[mk].income || 0) - monthTotals(state, mk).aTotal)).reduce((a, b) => a + b, 0)
+  // Calculate R12M (Rolling 12-Month) savings instead of YTD
+  const year = key.slice(0,4)
+  const currentMonth = parseInt(key.slice(5,7))
+  
+  const months = []
+  // Create rolling 12-month sequence starting from September
+  if (currentMonth >= 9) {
+    // Add months 09-12 from current year
+    for(let m = 9; m <= 12; m++) {
+      const monthKey = `${year}-${m.toString().padStart(2, '0')}`
+      months.push(monthKey)
+    }
+    // Add months 01-08 from next year
+    const nextYear = (parseInt(year) + 1).toString()
+    for(let m = 1; m <= 8; m++) {
+      const monthKey = `${nextYear}-${m.toString().padStart(2, '0')}`
+      months.push(monthKey)
+    }
+  } else {
+    // Add months 09-12 from previous year
+    const prevYear = (parseInt(year) - 1).toString()
+    for(let m = 9; m <= 12; m++) {
+      const monthKey = `${prevYear}-${m.toString().padStart(2, '0')}`
+      months.push(monthKey)
+    }
+    // Add months 01-08 from current year
+    for(let m = 1; m <= 8; m++) {
+      const monthKey = `${year}-${m.toString().padStart(2, '0')}`
+      months.push(monthKey)
+    }
+  }
+  
+  // Calculate R12M savings - only count months that exist and are <= current month
+  const idx = state.order.indexOf(key)
+  const pastMonths = months.filter(k => {
+    const monthIdx = state.order.indexOf(k)
+    return monthIdx >= 0 && monthIdx <= idx
+  })
+  
+  const r12mSavings = pastMonths.map(mk => {
+    const monthData = state.months[mk]
+    if (!monthData) return 0
+    const income = monthData.income || 0
+    const expenses = monthTotals(state, mk).aTotal || 0
+    return Math.max(0, income - expenses)
+  }).reduce((a, b) => a + b, 0)
+  
   const target = state.target || 0
-  const pct = target > 0 ? Math.min(1, ytdSav / target) : 0
+  const pct = target > 0 ? Math.min(1, r12mSavings / target) : 0
   
   // Create gradients
   const progressGradient = createGradient(svg, 'gaugeProgress', '#10b981', '#059669')
@@ -60,7 +104,7 @@ export function drawGauge(state, key) {
   svg.appendChild(percentText)
   
   // LARGE amount display - center - REDUCED SIZE
-  const amountText = text(380, 240, `${fmt(real(state, ytdSav))} SEK`, 'middle', '#f8fafc', 32, '700')
+  const amountText = text(380, 240, `${fmt(real(state, r12mSavings))} SEK`, 'middle', '#f8fafc', 32, '700')
   svg.appendChild(amountText)
   
   // Target context - below amount - REDUCED SIZE

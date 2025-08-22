@@ -40,30 +40,101 @@ export function drawGlidepath(state, key){
     }
   }
   
-  const idx=state.order.indexOf(key), past=months.filter(k=>state.order.indexOf(k)<=idx && state.order.indexOf(k)>=0)
-  const ytdSav=past.map(mk=>Math.max(0, ((state.months[mk] && state.months[mk].income)||0) - (state.months[mk] ? monthTotals(state,mk).aTotal : 0))).reduce((a,b)=>a+b,0)
-  const rem=12 - past.length, remaining=Math.max(0,(state.target||0)-ytdSav), req = rem>0? remaining/rem : 0
-  const mTarget=(state.target||0)/12
-  const series=[]
-  months.forEach(mk=>{
-    if(state.order.indexOf(mk)<=idx && state.order.indexOf(mk)>=0){
-      series.push({m:mk, v:Math.max(0, ((state.months[mk] && state.months[mk].income)||0) - (state.months[mk] ? monthTotals(state,mk).aTotal : 0)), t:'a'})
-    }else{
-      series.push({m:mk, v:req, t:'r'})
+  const idx=state.order.indexOf(key)
+  
+  // Calculate R12M (Rolling 12-Month) savings - only count past months that exist
+  const pastMonths = months.filter(k => {
+    const monthIdx = state.order.indexOf(k)
+    return monthIdx >= 0 && monthIdx <= idx
+  })
+  
+  const r12mSavings = pastMonths.map(mk => {
+    const monthData = state.months[mk]
+    if (!monthData) return 0
+    const income = monthData.income || 0
+    const expenses = monthTotals(state, mk).aTotal || 0
+    return Math.max(0, income - expenses)
+  }).reduce((a, b) => a + b, 0)
+  
+  // Calculate remaining months in the fiscal year
+  const remainingMonths = months.filter(k => {
+    const monthIdx = state.order.indexOf(k)
+    return monthIdx < 0 || monthIdx > idx
+  }).length
+  
+  // Calculate what's needed to hit annual target
+  const annualTarget = state.target || 0
+  const remainingToTarget = Math.max(0, annualTarget - r12mSavings)
+  const requiredPerMonth = remainingMonths > 0 ? remainingToTarget / remainingMonths : 0
+  
+  // Monthly target for comparison (annual target / 12)
+  const monthlyTarget = annualTarget / 12
+  const series = []
+  months.forEach(mk => {
+    const monthIdx = state.order.indexOf(mk)
+    if (monthIdx >= 0 && monthIdx <= idx) {
+      // Past/current month - show actual savings
+      const monthData = state.months[mk]
+      const income = (monthData && monthData.income) || 0
+      const expenses = monthData ? monthTotals(state, mk).aTotal : 0
+      const actualSavings = Math.max(0, income - expenses)
+      series.push({ m: mk, v: actualSavings, t: 'actual' })
+    } else {
+      // Future month - show required savings
+      series.push({ m: mk, v: requiredPerMonth, t: 'required' })
     }
   })
-  const ymax=Math.max(mTarget, ...series.map(s=>s.v), 1), bw=innerW/months.length*0.65
-  series.forEach((s,i)=>{
-    const h=(s.v/ymax)*innerH, x=padL + i*(innerW/months.length) + ((innerW/months.length)-bw)/2, y=padT + innerH - h
-    const color = s.t==='a' ? (s.v>=mTarget ? '#10b981' : '#ef4444') : '#f59e0b'
-    const r=ns('rect'); r.setAttribute('x',x); r.setAttribute('y',y); r.setAttribute('width',bw); r.setAttribute('height',h); r.setAttribute('fill',color); svg.appendChild(r)
-    svg.appendChild(text(x+bw/2, H-12, s.m.slice(5), 'middle', '#9aa3b2', 12))
+  
+  const ymax = Math.max(monthlyTarget, ...series.map(s => s.v), 1)
+  const bw = innerW / months.length * 0.65
+  
+  series.forEach((s, i) => {
+    const h = (s.v / ymax) * innerH
+    const x = padL + i * (innerW / months.length) + ((innerW / months.length) - bw) / 2
+    const y = padT + innerH - h
+    
+    let color
+    if (s.t === 'actual') {
+      color = s.v >= monthlyTarget ? '#10b981' : '#ef4444' // Green if above target, red if below
+    } else {
+      color = '#f59e0b' // Orange for required future savings
+    }
+    
+    const r = ns('rect')
+    r.setAttribute('x', x)
+    r.setAttribute('y', y)
+    r.setAttribute('width', bw)
+    r.setAttribute('height', h)
+    r.setAttribute('fill', color)
+    svg.appendChild(r)
+    
+    svg.appendChild(text(x + bw / 2, H - 12, s.m.slice(5), 'middle', '#9aa3b2', 12))
   })
-  const ty=padT + innerH - (mTarget/ymax)*innerH
-  const line=ns('line'); line.setAttribute('x1', padL); line.setAttribute('x2', padL+innerW); line.setAttribute('y1', ty); line.setAttribute('y2', ty); line.setAttribute('stroke','#93c5fd'); line.setAttribute('stroke-dasharray','5,5'); svg.appendChild(line)
-  svg.appendChild(text(padL+innerW-6, ty-6, 'Monthly target '+fmt(real(state,mTarget)), 'end', '#cfe4ff', 16))
-  const pill=document.getElementById('glidePill')
-  if(pill){ if(remaining<=0){ pill.textContent='On track ✔'; pill.classList.add('ok') } else { pill.textContent='From now: need '+fmt(real(state,req))+' SEK / month'; pill.classList.remove('ok') } }
+  
+  // Monthly target line
+  const ty = padT + innerH - (monthlyTarget / ymax) * innerH
+  const line = ns('line')
+  line.setAttribute('x1', padL)
+  line.setAttribute('x2', padL + innerW)
+  line.setAttribute('y1', ty)
+  line.setAttribute('y2', ty)
+  line.setAttribute('stroke', '#93c5fd')
+  line.setAttribute('stroke-dasharray', '5,5')
+  svg.appendChild(line)
+  
+  svg.appendChild(text(padL + innerW - 6, ty - 6, 'Monthly target ' + fmt(real(state, monthlyTarget)), 'end', '#cfe4ff', 16))
+  
+  // Update pill with correct status
+  const pill = document.getElementById('glidePill')
+  if (pill) {
+    if (remainingToTarget <= 0) {
+      pill.textContent = 'On track ✔'
+      pill.classList.add('ok')
+    } else {
+      pill.textContent = 'From now: need ' + fmt(real(state, requiredPerMonth)) + ' SEK / month'
+      pill.classList.remove('ok')
+    }
+  }
 }
 
 function fmt(n){ return (Math.round(n)).toLocaleString('sv-SE') }

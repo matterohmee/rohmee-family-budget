@@ -58,100 +58,99 @@ export function drawMonthlyTrends(state, key) {
 
   if (months.length === 0) return
 
-  const data = months.map(monthKey => {
-    const income = (state.months[monthKey] && state.months[monthKey].income) || 0
-    const expenses = state.months[monthKey] ? monthTotals(state, monthKey).aTotal : 0
-    return { month: monthKey, income: income, expenses: expenses }
+  // Calculate percentage of income spent for each month
+  const data = months.map(mk => {
+    const monthData = state.months[mk]
+    if (!monthData) return { month: mk, percentage: 0 }
+    
+    const income = monthData.income || 0
+    const expenses = Object.keys(monthData.actual || {}).reduce((total, parent) => {
+      return total + Object.values(monthData.actual[parent] || {}).reduce((sum, val) => sum + (val || 0), 0)
+    }, 0)
+    
+    const percentage = income > 0 ? (expenses / income) * 100 : 0
+    return { month: mk, percentage: Math.min(percentage, 100) } // Cap at 100%
   })
 
-  // Ensure we have valid data to prevent NaN issues
-  const validData = data.filter(d => !isNaN(d.income) && !isNaN(d.expenses))
-  if (validData.length === 0) return
+  const maxPercentage = Math.max(100, Math.max(...data.map(d => d.percentage)))
+  
+  // Scales
+  const xScale = (i) => padL + (i / (months.length - 1)) * innerW
+  const yScale = (val) => padT + innerH - (val / maxPercentage) * innerH
 
-  const maxVal = Math.max(1, ...validData.map(d => Math.max(d.income, d.expenses)))
-  const minVal = Math.min(0, ...validData.map(d => Math.min(d.income, d.expenses)))
+  // Background
+  const bg = ns('rect')
+  bg.setAttribute('width', W)
+  bg.setAttribute('height', H)
+  bg.setAttribute('fill', 'transparent')
+  svg.appendChild(bg)
 
-  const yScale = (val) => padT + innerH - ((val - minVal) / (maxVal - minVal)) * innerH
-  const xScale = (idx) => padL + (idx / (months.length - 1)) * innerW
-
-  // Draw X-axis
-  const xAxisY = yScale(0)
-  svg.appendChild(ns('line')).setAttributes({
-    x1: padL, y1: xAxisY, x2: padL + innerW, y2: xAxisY, stroke: '#374151', 'stroke-width': 1
-  })
-
-  // Draw Y-axis
-  svg.appendChild(ns('line')).setAttributes({
-    x1: padL, y1: padT, x2: padL, y2: padT + innerH, stroke: '#374151', 'stroke-width': 1
-  })
+  // Grid lines (horizontal)
+  for (let i = 0; i <= 5; i++) {
+    const y = padT + (i / 5) * innerH
+    const line = ns('line')
+    line.setAttribute('x1', padL)
+    line.setAttribute('y1', y)
+    line.setAttribute('x2', padL + innerW)
+    line.setAttribute('y2', y)
+    line.setAttribute('stroke', '#374151')
+    line.setAttribute('stroke-width', 0.5)
+    svg.appendChild(line)
+    
+    const label = (100 - (i / 5) * 100).toFixed(0) + '%'
+    svg.appendChild(text(padL - 10, y + 4, label, 'end', '#9ca3af', 11))
+  }
 
   // X-axis labels
-  months.forEach((monthKey, i) => {
+  months.forEach((mk, i) => {
     const x = xScale(i)
-    svg.appendChild(text(x, xAxisY + 20, monthKey.slice(0, 7), 'middle', '#94a3b8', 14))
+    const monthLabel = mk.slice(5, 7) // Just the month number
+    svg.appendChild(text(x, H - padB + 20, monthLabel, 'middle', '#9ca3af', 11))
   })
 
-  // Y-axis labels
-  const numYLabels = 5
-  for (let i = 0; i <= numYLabels; i++) {
-    const val = minVal + (i / numYLabels) * (maxVal - minVal)
-    const y = yScale(val)
-    svg.appendChild(text(padL - 10, y + 5, fmt(val), 'end', '#94a3b8', 14))
-    svg.appendChild(ns('line')).setAttributes({
-      x1: padL, y1: y, x2: padL + innerW, y2: y, stroke: '#374151', 'stroke-dasharray': '2,2', 'stroke-width': 0.5
-    })
+  // Draw line
+  if (data.length > 1) {
+    const path = ns('path')
+    let pathData = `M ${xScale(0)} ${yScale(data[0].percentage)}`
+    
+    for (let i = 1; i < data.length; i++) {
+      pathData += ` L ${xScale(i)} ${yScale(data[i].percentage)}`
+    }
+    
+    path.setAttribute('d', pathData)
+    path.setAttribute('stroke', '#f59e0b')
+    path.setAttribute('stroke-width', 3)
+    path.setAttribute('fill', 'none')
+    path.setAttribute('stroke-linecap', 'round')
+    path.setAttribute('stroke-linejoin', 'round')
+    svg.appendChild(path)
   }
 
-  // Draw Income Line
-  const incomePath = ns('path')
-  let dIncome = `M${xScale(0)},${yScale(data[0].income)}`
-  for (let i = 1; i < data.length; i++) {
-    dIncome += `L${xScale(i)},${yScale(data[i].income)}`
-  }
-  incomePath.setAttribute('d', dIncome)
-  incomePath.setAttribute('fill', 'none')
-  incomePath.setAttribute('stroke', '#3b82f6') // Blue for Income
-  incomePath.setAttribute('stroke-width', 3)
-  svg.appendChild(incomePath)
-
-  // Draw Expenses Line
-  const expensesPath = ns('path')
-  let dExpenses = `M${xScale(0)},${yScale(data[0].expenses)}`
-  for (let i = 1; i < data.length; i++) {
-    dExpenses += `L${xScale(i)},${yScale(data[i].expenses)}`
-  }
-  expensesPath.setAttribute('d', dExpenses)
-  expensesPath.setAttribute('fill', 'none')
-  expensesPath.setAttribute('stroke', '#ef4444') // Red for Expenses
-  expensesPath.setAttribute('stroke-width', 3)
-  svg.appendChild(expensesPath)
-
-  // Add circles for data points
+  // Draw points
   data.forEach((d, i) => {
-    svg.appendChild(ns('circle')).setAttributes({
-      cx: xScale(i), cy: yScale(d.income), r: 4, fill: '#3b82f6', stroke: '#0a0e1a', 'stroke-width': 2
-    })
-    svg.appendChild(ns('circle')).setAttributes({
-      cx: xScale(i), cy: yScale(d.expenses), r: 4, fill: '#ef4444', stroke: '#0a0e1a', 'stroke-width': 2
-    })
+    const circle = ns('circle')
+    circle.setAttribute('cx', xScale(i))
+    circle.setAttribute('cy', yScale(d.percentage))
+    circle.setAttribute('r', 4)
+    circle.setAttribute('fill', '#f59e0b')
+    circle.setAttribute('stroke', '#1f2937')
+    circle.setAttribute('stroke-width', 2)
+    svg.appendChild(circle)
   })
 
-  // Add legend
-  svg.appendChild(text(padL, padT - 15, 'Monthly Income vs. Expenses', 'start', '#f8fafc', 18, '600'))
-  svg.appendChild(ns('rect')).setAttributes({ x: padL + 300, y: padT - 25, width: 15, height: 15, fill: '#3b82f6' })
-  svg.appendChild(text(padL + 320, padT - 15, 'Income', 'start', '#f8fafc', 14))
-  svg.appendChild(ns('rect')).setAttributes({ x: padL + 400, y: padT - 25, width: 15, height: 15, fill: '#ef4444' })
-  svg.appendChild(text(padL + 420, padT - 15, 'Expenses', 'start', '#f8fafc', 14))
+  // Title
+  svg.appendChild(text(padL, 25, 'Percentage of Income Spent', 'start', '#e5e7eb', 14, 'bold'))
+  
+  // Legend
+  const legendY = padT + 10
+  svg.appendChild(text(padL + innerW - 200, legendY, '% of Income Spent', 'start', '#f59e0b', 12))
+  
+  const legendLine = ns('line')
+  legendLine.setAttribute('x1', padL + innerW - 220)
+  legendLine.setAttribute('y1', legendY - 4)
+  legendLine.setAttribute('x2', padL + innerW - 210)
+  legendLine.setAttribute('y2', legendY - 4)
+  legendLine.setAttribute('stroke', '#f59e0b')
+  legendLine.setAttribute('stroke-width', 3)
+  svg.appendChild(legendLine)
 }
-
-function fmt(n) { return (Math.round(n)).toLocaleString('sv-SE') }
-
-// Helper to set multiple attributes
-SVGElement.prototype.setAttributes = function(attrs) {
-  for (var key in attrs) {
-    this.setAttribute(key, attrs[key])
-  }
-  return this
-}
-
-

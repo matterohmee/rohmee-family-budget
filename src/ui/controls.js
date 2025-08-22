@@ -30,6 +30,10 @@ export function renderControls(state, onChange){
         <label for="loadJsonInput" class="chip">Load JSON</label>
         <input id="loadJsonInput" type="file" accept="application/json" style="display:none">
       </div>
+      <div class="row">
+        <button class="btn ghost" id="clearMonth">Clear Month</button>
+        <button class="btn ghost" id="copyBudget">Copy Last Budget</button>
+      </div>
       <div class="help" style="color:var(--muted)">Tip: double‑click names to rename; +/− to add/remove; click parent to highlight; ▸ to collapse/expand; F/V to toggle fixed vs variable.</div>
     </div>
   `
@@ -151,5 +155,50 @@ export function renderControls(state, onChange){
     const csv = rows.map(r=>r.map(x=>`"${String(x).replace('"','""')}"`).join(',')).join('\n')
     const a = document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download='budget.csv'; a.click()
     setTimeout(()=>URL.revokeObjectURL(a.href), 1000)
+  })
+
+  // Clear Month Button - Reset all budget and actual to 0 for current month
+  c.querySelector('#clearMonth').addEventListener('click', () => {
+    const currentKey = sel.value
+    const month = state.months[currentKey]
+    if (confirm(`Clear all budget and actual amounts for ${currentKey}?`)) {
+      // Clear all budget amounts
+      Object.keys(month.budget).forEach(parent => {
+        Object.keys(month.budget[parent]).forEach(sub => {
+          month.budget[parent][sub] = 0
+        })
+      })
+      // Clear all actual amounts
+      Object.keys(month.actual).forEach(parent => {
+        Object.keys(month.actual[parent]).forEach(sub => {
+          month.actual[parent][sub] = 0
+        })
+      })
+      onChange()
+    }
+  })
+
+  // Copy Budget Button - Copy budget amounts from previous month
+  c.querySelector('#copyBudget').addEventListener('click', () => {
+    const currentKey = sel.value
+    const currentIndex = state.order.indexOf(currentKey)
+    if (currentIndex > 0) {
+      const prevKey = state.order[currentIndex - 1]
+      const currentMonth = state.months[currentKey]
+      const prevMonth = state.months[prevKey]
+      
+      if (confirm(`Copy budget amounts from ${prevKey} to ${currentKey}?`)) {
+        // Copy only budget amounts (not actual)
+        Object.keys(prevMonth.budget).forEach(parent => {
+          if (!currentMonth.budget[parent]) currentMonth.budget[parent] = {}
+          Object.keys(prevMonth.budget[parent]).forEach(sub => {
+            currentMonth.budget[parent][sub] = prevMonth.budget[parent][sub]
+          })
+        })
+        onChange()
+      }
+    } else {
+      alert('No previous month available to copy from.')
+    }
   })
 }
