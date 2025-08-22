@@ -1,4 +1,5 @@
 import { monthTotals, real } from '../state/calc.js'
+import { addTooltip } from '../ui/tooltip.js'
 
 function ns(t) { return document.createElementNS('http://www.w3.org/2000/svg', t) }
 
@@ -184,43 +185,9 @@ export function drawSpendingTrends(state, key) {
     const xLabel = text(x, margin.top + chartHeight + 20, month.label, 'middle', '#94a3b8', 14)
     svg.appendChild(xLabel)
     
-    // Add hover effects
-    point.addEventListener('mouseenter', () => {
-      point.setAttribute('r', 6)
-      point.setAttribute('fill', '#1d4ed8')
-      pointBg.setAttribute('opacity', '1')
-      
-      // Show tooltip
-      const tooltip = document.getElementById('tooltip')
-      if (tooltip) {
-        tooltip.style.display = 'block'
-        tooltip.innerHTML = `
-          <div style="font-weight: 600; margin-bottom: 4px;">Month ${month.label}</div>
-          <div>Total Spending: ${fmt(month.data.aTotal)} SEK</div>
-          <div>Budget: ${fmt(month.data.bTotal)} SEK</div>
-          <div>Variance: ${fmt(month.data.aTotal - month.data.bTotal)} SEK</div>
-        `
-      }
-    })
-    
-    point.addEventListener('mouseleave', () => {
-      point.setAttribute('r', 4)
-      point.setAttribute('fill', '#3b82f6')
-      pointBg.setAttribute('opacity', '0')
-      
-      const tooltip = document.getElementById('tooltip')
-      if (tooltip) {
-        tooltip.style.display = 'none'
-      }
-    })
-    
-    point.addEventListener('mousemove', (e) => {
-      const tooltip = document.getElementById('tooltip')
-      if (tooltip) {
-        tooltip.style.left = (e.pageX + 10) + 'px'
-        tooltip.style.top = (e.pageY - 10) + 'px'
-      }
-    })
+    // Add tooltip functionality
+    const tooltipText = `Month ${month.label}: ${fmt(month.data.aTotal)} SEK spent (Budget: ${fmt(month.data.bTotal)} SEK)`
+    addTooltip(point, tooltipText)
   })
   
   // Animate elements
