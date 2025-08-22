@@ -1,5 +1,6 @@
 import { monthTotals, real } from '../state/calc.js'
 import { MODEL } from '../state/model.js'
+import { addTooltip } from '../ui/tooltip.js'
 const ns=t=>document.createElementNS('http://www.w3.org/2000/svg', t)
 const text=(x,y,t,anchor='start',fill='#cbd5e1',fs=12)=>{const el=ns('text');el.setAttribute('x',x);el.setAttribute('y',y);el.setAttribute('text-anchor',anchor);el.setAttribute('fill',fill);el.setAttribute('font-size',fs);el.textContent=t;return el}
 
@@ -29,9 +30,8 @@ export function drawShareBars(state, key){
     r.style.cursor = 'pointer';
     
     // Add tooltip functionality
-    const tooltip = ns('title')
-    tooltip.textContent = `${e.p}: ${((e.v/total)*100).toFixed(1)}% (${fmt(real(state,e.v))} SEK)`
-    r.appendChild(tooltip)
+    const tooltipText = `${e.p}: ${((e.v/total)*100).toFixed(1)}% (${fmt(real(state,e.v))} SEK)`
+    addTooltip(r, tooltipText)
     
     // Add glow effect for highlighted category
     if (isHighlighted) {

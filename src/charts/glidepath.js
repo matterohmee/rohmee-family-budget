@@ -1,5 +1,6 @@
 import { monthTotals, real } from '../state/calc.js'
 
+import { addTooltip } from '../ui/tooltip.js'
 const ns = t => document.createElementNS('http://www.w3.org/2000/svg', t)
 const text = (x,y,t,anchor='start',fill='#cbd5e1',fs=12)=>{const el=ns('text');el.setAttribute('x',x);el.setAttribute('y',y);el.setAttribute('text-anchor',anchor);el.setAttribute('fill',fill);el.setAttribute('font-size',fs);el.textContent=t;return el}
 
@@ -106,6 +107,14 @@ export function drawGlidepath(state, key){
     r.setAttribute('width', bw)
     r.setAttribute('height', h)
     r.setAttribute('fill', color)
+    r.style.cursor = 'pointer'
+    
+    // Add tooltip
+    const tooltipText = s.t === 'actual' 
+      ? `${s.m}: ${fmt(real(state, s.v))} SEK saved (${s.v >= monthlyTarget ? 'Above' : 'Below'} target)`
+      : `${s.m}: ${fmt(real(state, s.v))} SEK required to hit target`
+    addTooltip(r, tooltipText)
+    
     svg.appendChild(r)
     
     svg.appendChild(text(x + bw / 2, H - 12, s.m.slice(5), 'middle', '#9aa3b2', 12))

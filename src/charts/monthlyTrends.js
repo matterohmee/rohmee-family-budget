@@ -1,5 +1,7 @@
 import { monthTotals, real } from '../state/calc.js'
 
+import { addTooltip } from '../ui/tooltip.js'
+
 function ns(t) { return document.createElementNS("http://www.w3.org/2000/svg", t) }
 
 function text(x, y, t, anchor = 'start', fill = '#cbd5e1', fs = 12, fw = 'normal') {
@@ -140,9 +142,8 @@ export function drawMonthlyTrends(state, key) {
     circle.style.cursor = 'pointer'
     
     // Add tooltip functionality
-    const tooltip = ns('title')
-    tooltip.textContent = `${d.month}: ${d.percentage.toFixed(1)}% of income spent`
-    circle.appendChild(tooltip)
+    const tooltipText = `${d.month}: ${d.percentage.toFixed(1)}% of income spent`
+    addTooltip(circle, tooltipText)
     
     svg.appendChild(circle)
   })
