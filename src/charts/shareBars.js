@@ -15,8 +15,9 @@ export function drawShareBars(state, key){
     
     // Determine color based on highlighting
     const isHighlighted = state.highlightedCategory === e.p
+    const hasHighlighting = state.highlightedCategory && state.highlightedCategory !== null
     const barColor = isHighlighted ? '#f59e0b' : '#3b82f6' // Orange for highlighted, blue for normal
-    const barOpacity = state.highlightedCategory && !isHighlighted ? 0.3 : 1 // Dim non-highlighted when something is highlighted
+    const barOpacity = hasHighlighting && !isHighlighted ? 0.3 : 1 // Dim non-highlighted when something is highlighted
     
     const r=ns('rect'); 
     r.setAttribute('x',padL); 
@@ -25,6 +26,12 @@ export function drawShareBars(state, key){
     r.setAttribute('height',rw); 
     r.setAttribute('fill',barColor);
     r.setAttribute('opacity',barOpacity);
+    r.style.cursor = 'pointer';
+    
+    // Add tooltip functionality
+    const tooltip = ns('title')
+    tooltip.textContent = `${e.p}: ${((e.v/total)*100).toFixed(1)}% (${fmt(real(state,e.v))} SEK)`
+    r.appendChild(tooltip)
     
     // Add glow effect for highlighted category
     if (isHighlighted) {
@@ -34,14 +41,16 @@ export function drawShareBars(state, key){
     svg.appendChild(r)
     
     // Adjust text opacity for highlighting
-    const textOpacity = state.highlightedCategory && !isHighlighted ? 0.5 : 1
+    const textOpacity = hasHighlighting && !isHighlighted ? 0.5 : 1
     
     const lab=(state.icons[e.p]||'')+' '+e.p
     const labelText = text(padL-16, y+rw/2+6, lab, 'end', '#cbd5e1', 15)
     labelText.setAttribute('opacity', textOpacity)
     svg.appendChild(labelText)
     
-    const valueText = text(padL + w + 12, y+rw/2+6, ((e.v/total)*100).toFixed(1)+'%  ·  '+fmt(real(state,e.v))+' SEK', 'start', '#cbd5e1', 14)
+    // Ensure value text stays within chart boundaries
+    const valueX = Math.min(padL + w + 12, W - padR - 250) // Keep 250px from right edge
+    const valueText = text(valueX, y+rw/2+6, ((e.v/total)*100).toFixed(1)+'%  ·  '+fmt(real(state,e.v))+' SEK', 'start', '#cbd5e1', 14)
     valueText.setAttribute('opacity', textOpacity)
     svg.appendChild(valueText)
   })

@@ -15,10 +15,11 @@ export function drawBAvsParents(state, key){
     
     // Determine colors and opacity based on highlighting
     const isHighlighted = state.highlightedCategory === e.p
+    const hasHighlighting = state.highlightedCategory && state.highlightedCategory !== null
     const budgetColor = isHighlighted ? '#f59e0b' : '#3b82f6' // Orange for highlighted, blue for normal
     const actualColor = isHighlighted ? '#f97316' : '#10b981' // Orange variant for highlighted, green for normal
-    const barOpacity = state.highlightedCategory && !isHighlighted ? 0.3 : 1
-    const textOpacity = state.highlightedCategory && !isHighlighted ? 0.5 : 1
+    const barOpacity = hasHighlighting && !isHighlighted ? 0.3 : 1
+    const textOpacity = hasHighlighting && !isHighlighted ? 0.5 : 1
     
     const b=ns('rect'); 
     b.setAttribute('x',padL); 
@@ -27,6 +28,12 @@ export function drawBAvsParents(state, key){
     b.setAttribute('height',bw); 
     b.setAttribute('fill',budgetColor);
     b.setAttribute('opacity',barOpacity);
+    b.style.cursor = 'pointer';
+    
+    // Add tooltip for budget bar
+    const budgetTooltip = ns('title')
+    budgetTooltip.textContent = `${e.p} Budget: ${fmt(real(state,e.b))} SEK`
+    b.appendChild(budgetTooltip)
     
     // Add glow effect for highlighted category
     if (isHighlighted) {
@@ -42,6 +49,12 @@ export function drawBAvsParents(state, key){
     a.setAttribute('height',bw); 
     a.setAttribute('fill',actualColor);
     a.setAttribute('opacity',barOpacity);
+    a.style.cursor = 'pointer';
+    
+    // Add tooltip for actual bar
+    const actualTooltip = ns('title')
+    actualTooltip.textContent = `${e.p} Actual: ${fmt(real(state,e.a))} SEK`
+    a.appendChild(actualTooltip)
     
     // Add glow effect for highlighted category
     if (isHighlighted) {
@@ -55,7 +68,10 @@ export function drawBAvsParents(state, key){
     labelText.setAttribute('opacity', textOpacity)
     svg.appendChild(labelText)
     
-    const valueText = text(padL + Math.max(wB,wA) + 10, y+4, 'B '+fmt(real(state,e.b))+'  A '+fmt(real(state,e.a)), 'start', '#cbd5e1', 12)
+    // Ensure value text stays within chart boundaries
+    const maxBarWidth = Math.max(wB, wA)
+    const valueX = Math.min(padL + maxBarWidth + 10, W - padR - 200) // Keep 200px from right edge
+    const valueText = text(valueX, y+4, 'B '+fmt(real(state,e.b))+'  A '+fmt(real(state,e.a)), 'start', '#cbd5e1', 12)
     valueText.setAttribute('opacity', textOpacity)
     svg.appendChild(valueText)
   })

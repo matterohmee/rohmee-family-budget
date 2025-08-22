@@ -69,10 +69,12 @@ export function drawMonthlyTrends(state, key) {
     }, 0)
     
     const percentage = income > 0 ? (expenses / income) * 100 : 0
-    return { month: mk, percentage: Math.min(percentage, 100) } // Cap at 100%
+    return { month: mk, percentage: percentage } // Remove 100% cap
   })
 
-  const maxPercentage = Math.max(100, Math.max(...data.map(d => d.percentage)))
+  // Dynamic Y-axis scaling - minimum 100%, but can go higher
+  const maxDataPercentage = Math.max(...data.map(d => d.percentage))
+  const maxPercentage = Math.max(100, Math.ceil(maxDataPercentage / 50) * 50) // Round up to nearest 50%
   
   // Scales
   const xScale = (i) => padL + (i / (months.length - 1)) * innerW
@@ -85,7 +87,7 @@ export function drawMonthlyTrends(state, key) {
   bg.setAttribute('fill', 'transparent')
   svg.appendChild(bg)
 
-  // Grid lines (horizontal)
+  // Grid lines (horizontal) - dynamic scale
   for (let i = 0; i <= 5; i++) {
     const y = padT + (i / 5) * innerH
     const line = ns('line')
@@ -97,7 +99,7 @@ export function drawMonthlyTrends(state, key) {
     line.setAttribute('stroke-width', 0.5)
     svg.appendChild(line)
     
-    const label = (100 - (i / 5) * 100).toFixed(0) + '%'
+    const label = (maxPercentage - (i / 5) * maxPercentage).toFixed(0) + '%'
     svg.appendChild(text(padL - 10, y + 4, label, 'end', '#9ca3af', 11))
   }
 
@@ -126,7 +128,7 @@ export function drawMonthlyTrends(state, key) {
     svg.appendChild(path)
   }
 
-  // Draw points
+  // Draw points with tooltips
   data.forEach((d, i) => {
     const circle = ns('circle')
     circle.setAttribute('cx', xScale(i))
@@ -135,6 +137,13 @@ export function drawMonthlyTrends(state, key) {
     circle.setAttribute('fill', '#f59e0b')
     circle.setAttribute('stroke', '#1f2937')
     circle.setAttribute('stroke-width', 2)
+    circle.style.cursor = 'pointer'
+    
+    // Add tooltip functionality
+    const tooltip = ns('title')
+    tooltip.textContent = `${d.month}: ${d.percentage.toFixed(1)}% of income spent`
+    circle.appendChild(tooltip)
+    
     svg.appendChild(circle)
   })
 
