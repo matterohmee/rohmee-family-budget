@@ -24,8 +24,9 @@ export function ensureMonth(state, key){
     Object.keys(MODEL).forEach(p=>{
       if(!state.months[key].budget[p]){ state.months[key].budget[p]={}; state.months[key].actual[p]={}; }
       Object.keys(MODEL[p]).forEach(s=>{
-        if(state.months[key].budget[p][s]===undefined) state.months[key].budget[p][s]=MODEL[p][s]
-        if(state.months[key].actual[p][s]===undefined) state.months[key].actual[p][s]=MODEL[p][s]
+        // Only set default values if the key doesn't exist at all, don't overwrite existing values (including 0)
+        if(!(s in state.months[key].budget[p])) state.months[key].budget[p][s]=MODEL[p][s]
+        if(!(s in state.months[key].actual[p])) state.months[key].actual[p][s]=MODEL[p][s]
       })
     })
     if(state.months[key].income===undefined) state.months[key].income = state.defaultIncome || 0
