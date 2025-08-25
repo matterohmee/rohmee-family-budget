@@ -51,34 +51,59 @@ export function drawSpendingTrends(state, key) {
   const chartWidth = width - margin.left - margin.right
   const chartHeight = height - margin.top - margin.bottom
   
-  // Get last 12 months of data
-  const currentYear = key.slice(0, 4)
-  const currentMonth = parseInt(key.slice(5, 7))
-  const months = []
+  // Create rolling 12-month sequence starting from September (09) - USE CURRENT YEAR DATA
+  const year = key.slice(0,4)
+  const currentMonth = parseInt(key.slice(5,7))
   
-  for (let i = 11; i >= 0; i--) {
-    let month = currentMonth - i
-    let year = parseInt(currentYear)
-    
-    if (month <= 0) {
-      month += 12
-      year -= 1
-    }
-    
-    const monthKey = `${year}-${month.toString().padStart(2, '0')}`
-    if (state.months[monthKey]) {
+  const months = []
+  // If we're in September or later, use current year for Sep-Dec and next year for Jan-Aug
+  // If we're before September, use previous year for Sep-Dec and current year for Jan-Aug
+  if (currentMonth >= 9) {
+    // Add months 09-12 from current year
+    for(let m = 9; m <= 12; m++) {
+      const monthKey = `${year}-${m.toString().padStart(2, '0')}`
       months.push({
         key: monthKey,
         label: monthKey.slice(5, 7),
-        data: monthTotals(state, monthKey)
+        data: state.months[monthKey] ? monthTotals(state, monthKey) : { aTotal: 0, bTotal: 0 }
+      })
+    }
+    // Add months 01-08 from next year
+    const nextYear = (parseInt(year) + 1).toString()
+    for(let m = 1; m <= 8; m++) {
+      const monthKey = `${nextYear}-${m.toString().padStart(2, '0')}`
+      months.push({
+        key: monthKey,
+        label: monthKey.slice(5, 7),
+        data: state.months[monthKey] ? monthTotals(state, monthKey) : { aTotal: 0, bTotal: 0 }
+      })
+    }
+  } else {
+    // Add months 09-12 from previous year
+    const prevYear = (parseInt(year) - 1).toString()
+    for(let m = 9; m <= 12; m++) {
+      const monthKey = `${prevYear}-${m.toString().padStart(2, '0')}`
+      months.push({
+        key: monthKey,
+        label: monthKey.slice(5, 7),
+        data: state.months[monthKey] ? monthTotals(state, monthKey) : { aTotal: 0, bTotal: 0 }
+      })
+    }
+    // Add months 01-08 from current year
+    for(let m = 1; m <= 8; m++) {
+      const monthKey = `${year}-${m.toString().padStart(2, '0')}`
+      months.push({
+        key: monthKey,
+        label: monthKey.slice(5, 7),
+        data: state.months[monthKey] ? monthTotals(state, monthKey) : { aTotal: 0, bTotal: 0 }
       })
     }
   }
   
   if (months.length === 0) return
   
-  // Calculate scales
-  const maxSpending = Math.max(...months.map(m => m.data.aTotal))
+  // Calculate scales - ensure we have a minimum scale even if all values are 0
+  const maxSpending = Math.max(...months.map(m => m.data.aTotal), 1) // Minimum 1 to avoid division by zero
   const xScale = chartWidth / (months.length - 1)
   const yScale = chartHeight / maxSpending
   

@@ -63,15 +63,17 @@ export function drawMonthlyTrends(state, key) {
   // Calculate percentage of income spent for each month
   const data = months.map(mk => {
     const monthData = state.months[mk]
-    if (!monthData) return { month: mk, percentage: 0 }
+    // If month doesn't exist in data, return 0 percentage
+    if (!monthData || !monthData.income) return { month: mk, percentage: 0 }
     
     const income = monthData.income || 0
     const expenses = Object.keys(monthData.actual || {}).reduce((total, parent) => {
       return total + Object.values(monthData.actual[parent] || {}).reduce((sum, val) => sum + (val || 0), 0)
     }, 0)
     
+    // Only calculate percentage if there's income, otherwise 0
     const percentage = income > 0 ? (expenses / income) * 100 : 0
-    return { month: mk, percentage: percentage } // Remove 100% cap
+    return { month: mk, percentage: percentage }
   })
 
   // Dynamic Y-axis scaling - minimum 100%, but can go higher
