@@ -37,6 +37,8 @@ export function renderTable(state, onStateChange){
       state.icons[nn]=state.icons[p]; delete state.icons[p]
       state.tags[nn]=state.tags[p]; delete state.tags[p]
       state.order.forEach(k=>{ const mm=state.months[k]; mm.budget[nn]=mm.budget[p]; mm.actual[nn]=mm.actual[p]; delete mm.budget[p]; delete mm.actual[p]; })
+      // Ensure categories are saved to state
+      state.categories = JSON.parse(JSON.stringify(MODEL))
       if(onStateChange) onStateChange();
     }
     
@@ -64,9 +66,9 @@ export function renderTable(state, onStateChange){
     const tag=document.createElement('span'); tag.className='chip'; tag.textContent=(state.tags[p]==='F'?'Fixed':'Variable'); tag.title='Toggle Fixed/Variable'
     tag.onclick=()=>{ state.tags[p]=(state.tags[p]==='F'?'V':'F'); if(onStateChange) onStateChange(); }
     const add=document.createElement('span'); add.className='chip'; add.textContent='+'; add.title='Add subcategory'
-    add.onclick=()=>{ const s=prompt('New subcategory under '+p+':'); if(!s) return; MODEL[p][s]=0; state.order.forEach(k=>{ const mm=state.months[k]; mm.budget[p][s]=0; mm.actual[p][s]=0; }); if(onStateChange) onStateChange(); }
+    add.onclick=()=>{ const s=prompt('New subcategory under '+p+':'); if(!s) return; MODEL[p][s]=0; state.order.forEach(k=>{ const mm=state.months[k]; mm.budget[p][s]=0; mm.actual[p][s]=0; }); state.categories = JSON.parse(JSON.stringify(MODEL)); if(onStateChange) onStateChange(); }
     const del=document.createElement('span'); del.className='chip'; del.textContent='−'; del.title='Delete parent'
-    del.onclick=()=>{ if(!confirm('Delete parent '+p+'?')) return; delete MODEL[p]; delete state.icons[p]; delete state.tags[p]; state.order.forEach(k=>{ const mm=state.months[k]; delete mm.budget[p]; delete mm.actual[p]; }); if(onStateChange) onStateChange(); }
+    del.onclick=()=>{ if(!confirm('Delete parent '+p+'?')) return; delete MODEL[p]; delete state.icons[p]; delete state.tags[p]; state.order.forEach(k=>{ const mm=state.months[k]; delete mm.budget[p]; delete mm.actual[p]; }); state.categories = JSON.parse(JSON.stringify(MODEL)); if(onStateChange) onStateChange(); }
     tools.appendChild(tag); tools.appendChild(add); tools.appendChild(del)
 
     td0.appendChild(toggle); td0.appendChild(ic); td0.appendChild(name); td0.appendChild(tools)
@@ -82,16 +84,17 @@ export function renderTable(state, onStateChange){
       Object.keys(MODEL[p]).forEach(s=>{
         const tr=document.createElement('tr'); if((m.actual[p]||{})[s] > (m.budget[p]||{})[s]) tr.className='over'
         const t0=document.createElement('td'); 
-        const nm=document.createElement('span'); nm.textContent='• '+s; nm.title='Double-click to rename'; nm.style.cursor='text'
-        nm.ondblclick=()=>{
-          const nn=prompt('Rename subcategory:', s); if(!nn) return;
+        const sn=document.createElement('span'); sn.textContent='• '+s; sn.title='Double-click to rename'; sn.style.cursor='pointer'
+        sn.ondblclick=()=>{
+          const nn=prompt('Rename subcategory:', s); if(!nn || MODEL[p][nn]) return;
           MODEL[p][nn]=MODEL[p][s]; delete MODEL[p][s];
           state.order.forEach(k=>{ const mm=state.months[k]; mm.budget[p][nn]=mm.budget[p][s]; mm.actual[p][nn]=mm.actual[p][s]; delete mm.budget[p][s]; delete mm.actual[p][s]; })
+          state.categories = JSON.parse(JSON.stringify(MODEL));
           if(onStateChange) onStateChange();
         }
-        t0.appendChild(nm)
+        t0.appendChild(sn)
         const sd=document.createElement('span'); sd.className='chip'; sd.textContent='−'; sd.title='Delete subcategory'; sd.style.marginLeft='8px'
-        sd.onclick=()=>{ if(!confirm('Delete '+s+'?')) return; delete MODEL[p][s]; state.order.forEach(k=>{ const mm=state.months[k]; delete mm.budget[p][s]; delete mm.actual[p][s]; }); if(onStateChange) onStateChange(); }
+        sd.onclick=()=>{ if(!confirm('Delete '+s+'?')) return; delete MODEL[p][s]; state.order.forEach(k=>{ const mm=state.months[k]; delete mm.budget[p][s]; delete mm.actual[p][s]; }); state.categories = JSON.parse(JSON.stringify(MODEL)); if(onStateChange) onStateChange(); }
         t0.appendChild(sd)
         tr.appendChild(t0)
 
@@ -110,6 +113,8 @@ export function renderTable(state, onStateChange){
     MODEL[name]={}; state.icons[name]='📦'; state.tags[name]='V'
     state.order.forEach(k=>{ const mm=state.months[k]; mm.budget[name]={}; mm.actual[name]={}; })
     document.getElementById('newParentName').value=''
+    // Ensure categories are saved to state
+    state.categories = JSON.parse(JSON.stringify(MODEL))
     if(onStateChange) onStateChange();
   }
 }

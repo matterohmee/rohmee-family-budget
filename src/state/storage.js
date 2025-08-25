@@ -16,10 +16,14 @@ export function loadState(){
       st.order.forEach(k => ensureMonth(st,k))
       st.icons = st.icons || DEFAULT_ICONS
       st.tags  = st.tags  || DEFAULT_TAGS
+      // Load custom categories from state, merge with default MODEL
+      st.categories = st.categories || JSON.parse(JSON.stringify(MODEL))
+      // Update the global MODEL with saved categories
+      Object.assign(MODEL, st.categories)
       return st
     }catch(e){ /* fallthrough to default */ }
   }
-  const st = { defaultIncome:DEFAULT_INCOME, target:250000, cpi:1.00, order:monthList(2025, 9), months:{}, icons:DEFAULT_ICONS, tags:DEFAULT_TAGS, selected:null, version:VERSION }
+  const st = { defaultIncome:DEFAULT_INCOME, target:250000, cpi:1.00, order:monthList(2025, 9), months:{}, icons:DEFAULT_ICONS, tags:DEFAULT_TAGS, selected:null, version:VERSION, categories:JSON.parse(JSON.stringify(MODEL)) }
   st.order.forEach(k => ensureMonth(st,k))
 
   saveState(st)
@@ -27,6 +31,8 @@ export function loadState(){
 }
 
 export function saveState(st){
+  // Save current MODEL state to categories before saving
+  st.categories = JSON.parse(JSON.stringify(MODEL))
   localStorage.setItem(STORAGE_KEY, JSON.stringify(st))
 }
 
