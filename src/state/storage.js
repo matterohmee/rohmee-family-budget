@@ -51,6 +51,14 @@ export function importJSON(file, cb){
     try{
       const st = JSON.parse(reader.result)
       migrate(st)
+      
+      // Load categories from imported data and update MODEL
+      if(st.categories) {
+        // Clear existing MODEL and replace with imported categories
+        Object.keys(MODEL).forEach(key => delete MODEL[key])
+        Object.assign(MODEL, st.categories)
+      }
+      
       saveState(st)
       cb(st)
     }catch(e){ alert('Invalid JSON file') }
