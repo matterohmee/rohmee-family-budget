@@ -4,7 +4,7 @@ export const DEFAULT_ICONS = {
 }
 
 export const DEFAULT_TAGS = {
-  "Housing":"F","Insurance":"F","Investments":"F",
+  "Housing":"F","Insurance":"F","Investments":"FS",
   "Kids":"V","Transport":"V","Groceries & Dining":"V","Health":"V","Lifestyle":"V"
 }
 

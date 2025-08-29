@@ -193,7 +193,7 @@ export class InsightsEngine {
   analyzeSavingsRate(months) {
     const latestMonth = months[months.length - 1]
     const savingsRate = latestMonth.income > 0 ? 
-      ((latestMonth.income - latestMonth.data.aTotal) / latestMonth.income) * 100 : 0
+      ((latestMonth.income - latestMonth.data.aTotal + (latestMonth.data.aSavings || 0)) / latestMonth.income) * 100 : 0
 
     if (savingsRate < 10) {
       return {
@@ -310,10 +310,10 @@ export class InsightsEngine {
 
     // Investment recommendation based on savings rate
     const savingsRate = latestMonth.income > 0 ? 
-      ((latestMonth.income - latestMonth.data.aTotal) / latestMonth.income) * 100 : 0
+      ((latestMonth.income - latestMonth.data.aTotal + (latestMonth.data.aSavings || 0)) / latestMonth.income) * 100 : 0
     
     if (savingsRate > 15) {
-      const investmentAmount = (latestMonth.income - latestMonth.data.aTotal) * 0.7
+      const investmentAmount = (latestMonth.income - latestMonth.data.aTotal + (latestMonth.data.aSavings || 0)) * 0.7
       recommendations.push({
         type: 'investment',
         title: 'Investment Opportunity',
