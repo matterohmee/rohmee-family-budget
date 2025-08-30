@@ -21,6 +21,10 @@ npm run build  # outputs to /dist
 - Use **Save JSON / Load JSON** buttons in the UI to back up and transfer data
 - Migrations are handled in `src/state/storage.js`
 
+## Category tags
+- Categories can be tagged as Fixed, Variable, or Savings.
+- "Investments" is tagged as Savings by default so it appears in Savings views and is excluded from expense charts.
+
 ## Structure
 ```
 src/
