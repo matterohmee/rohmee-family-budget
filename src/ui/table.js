@@ -63,27 +63,30 @@ export function renderTable(state, onStateChange){
       trP.style.borderLeft = '4px solid #3b82f6';
     }
     const tools=document.createElement('span'); tools.className='rowtools'
-    const tag=document.createElement('span'); tag.className='chip'; 
+    const tag=document.createElement('span'); tag.className='chip';
     const tagValue = state.tags[p] || 'V'
-    if(tagValue === 'FS') {
+    if(tagValue === 'S') {
+      tag.textContent = 'Savings'
+      tag.style.backgroundColor = '#10b981'
+      tag.style.color = 'white'
+    } else if(tagValue === 'FS') {
       tag.textContent = 'Fixed+Savings'
       tag.style.backgroundColor = '#10b981'
       tag.style.color = 'white'
     } else if(tagValue === 'VS') {
-      tag.textContent = 'Variable+Savings'  
+      tag.textContent = 'Variable+Savings'
       tag.style.backgroundColor = '#10b981'
       tag.style.color = 'white'
     } else {
       tag.textContent = (tagValue === 'F' ? 'Fixed' : 'Variable')
     }
     tag.title='Toggle Fixed/Variable/Savings'
-    tag.onclick=()=>{ 
+    tag.onclick=()=>{
       const current = state.tags[p] || 'V'
-      if(current === 'F') state.tags[p] = 'FS'
-      else if(current === 'FS') state.tags[p] = 'V'
-      else if(current === 'V') state.tags[p] = 'VS'
-      else if(current === 'VS') state.tags[p] = 'F'
-      if(onStateChange) onStateChange(); 
+      if(current === 'F') state.tags[p] = 'V'
+      else if(current === 'V') state.tags[p] = 'S'
+      else state.tags[p] = 'F'
+      if(onStateChange) onStateChange();
     }
     const add=document.createElement('span'); add.className='chip'; add.textContent='+'; add.title='Add subcategory'
     add.onclick=()=>{ const s=prompt('New subcategory under '+p+':'); if(!s) return; MODEL[p][s]=0; state.order.forEach(k=>{ const mm=state.months[k]; mm.budget[p][s]=0; mm.actual[p][s]=0; }); state.categories = JSON.parse(JSON.stringify(MODEL)); if(onStateChange) onStateChange(); }

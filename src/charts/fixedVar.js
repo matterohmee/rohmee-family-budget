@@ -47,7 +47,10 @@ export function drawFixedVar(state, key) {
   
   let fixed = 0, variable = 0
   Object.keys(mt.aParents).forEach(p => {
-    ((state.tags[p] === 'F') ? (fixed += mt.aParents[p] || 0) : (variable += mt.aParents[p] || 0))
+    const tag = state.tags[p] || 'V'
+    if(tag.includes('S')) return
+    if(tag === 'F') fixed += mt.aParents[p] || 0
+    else variable += mt.aParents[p] || 0
   })
   
   const total = fixed + variable || 1
