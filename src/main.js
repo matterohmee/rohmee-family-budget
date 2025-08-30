@@ -11,6 +11,7 @@ import { drawGlidepath } from './charts/glidepath.js'
 import { drawTotalsBar } from './charts/totalsBar.js'
 import { drawShareBars } from './charts/shareBars.js'
 import { drawBAvsParents } from './charts/baParents.js'
+import { drawSavingsBars } from './charts/savingsBars.js'
 import { drawHeatmap } from './charts/heatmap.js'
 import { drawBridge } from './charts/bridge.js'
 import { drawSpendingTrends } from './charts/spendingTrends.js'
@@ -71,8 +72,8 @@ app.innerHTML = `
   </div>
 
   <div class="panel">
-    <div class="legend"><span><i class="sw" style="background:#fbbf24"></i>Current Month: Share of Total Spend (by category)</span></div>
-    <svg id="shareBars" class="chart tall" viewBox="0 0 1200 700" aria-label="Share bars"></svg>
+    <div class="legend"><span><i class="sw" style="background:#fbbf24"></i>Current Month: Share of Total Expenses (by category)</span></div>
+    <svg id="shareBars" class="chart tall" viewBox="0 0 1200 700" aria-label="Share of expenses by category"></svg>
   </div>
 
   <div class="panel">
@@ -89,7 +90,12 @@ app.innerHTML = `
 
   <div class="panel">
     <div class="legend"><span><i class="sw" style="background:#3b82f6"></i>Budget</span><span><i class="sw" style="background:#10b981"></i>Actual</span></div>
-    <svg id="baParents" class="chart" viewBox="0 0 1200 460" aria-label="Budget vs Actual per parent"></svg>
+    <svg id="baParents" class="chart" viewBox="0 0 1200 460" aria-label="Budget vs Actual per expense category"></svg>
+  </div>
+
+  <div class="panel">
+    <div class="legend"><span><i class="sw" style="background:#10b981"></i>Current Month: Savings Categories</span></div>
+    <svg id="savingsBars" class="chart" viewBox="0 0 1200 300" aria-label="Savings by category"></svg>
   </div>
 
   <div class="panel">
@@ -177,6 +183,7 @@ function drawAll(){
   drawMonthlyTrends(state, key);
   drawShareBars(state, key);
   drawBAvsParents(state, key);
+  drawSavingsBars(state, key);
   drawHeatmap(state, key);
   drawBridge(state, key);}
 

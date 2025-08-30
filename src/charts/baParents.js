@@ -8,7 +8,11 @@ export function drawBAvsParents(state, key){
   const svg=document.getElementById('baParents'); while(svg.firstChild) svg.removeChild(svg.firstChild)
   const W=1200,H=460,padL=260,padR=40,padT=20,padB=60,innerW=W-padL-padR,innerH=H-padT-padB
   const m=monthTotals(state,key)
-  const arr=Object.keys(MODEL).map(p=>({p,b:m.bParents[p]||0,a:m.aParents[p]||0})).sort((x,y)=>y.a-x.a)
+  // Filter out savings categories - they're not expenses
+  const arr=Object.keys(MODEL)
+    .filter(p => !(state.tags[p] || 'V').includes('S')) // Exclude savings categories
+    .map(p=>({p,b:m.bParents[p]||0,a:m.aParents[p]||0}))
+    .sort((x,y)=>y.a-x.a)
   const n=arr.length, groupH=innerH/n, bw=groupH*0.35, max=Math.max(...arr.map(o=>Math.max(o.a,o.b)),1)
   arr.forEach((e,i)=>{
     const y=padT + i*groupH + groupH/2

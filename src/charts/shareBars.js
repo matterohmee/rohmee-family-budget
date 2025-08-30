@@ -8,7 +8,11 @@ export function drawShareBars(state, key){
   const svg=document.getElementById('shareBars'); while(svg.firstChild) svg.removeChild(svg.firstChild)
   const W=1200,H=700,padL=280,padR=40,padT=30,padB=60,innerW=W-padL-padR,innerH=H-padT-padB
   const mt=monthTotals(state,key)
-  const arr=Object.keys(MODEL).map(p=>({p, v:mt.aParents[p]||0})).sort((a,b)=>b.v-a.v)
+  // Filter out savings categories - they're not expenses
+  const arr=Object.keys(MODEL)
+    .filter(p => !(state.tags[p] || 'V').includes('S')) // Exclude savings categories
+    .map(p=>({p, v:mt.aParents[p]||0}))
+    .sort((a,b)=>b.v-a.v)
   const total=arr.reduce((a,b)=>a+b.v,0)||1
   const n=arr.length, rw=innerH/n*0.75
   arr.forEach((e,i)=>{
