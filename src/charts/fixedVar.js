@@ -49,10 +49,10 @@ export function drawFixedVar(state, key) {
   Object.keys(mt.aParents).forEach(p => {
     ((state.tags[p] === 'F') ? (fixed += mt.aParents[p] || 0) : (variable += mt.aParents[p] || 0))
   })
-  
-  const total = fixed + variable || 1
-  const fixedPct = Math.round((fixed / total) * 100)
-  const variablePct = Math.round((variable / total) * 100)
+
+  const income = state.months[key].income || 0
+  const fixedPct = income > 0 ? Math.round((fixed / income) * 100) : 0
+  const variablePct = income > 0 ? Math.round((variable / income) * 100) : 0
   
   // Create gradients
   const fixedGradient = createGradient(svg, 'fixedGrad', '#8b5cf6', '#7c3aed')
@@ -95,9 +95,9 @@ export function drawFixedVar(state, key) {
   const barHeight = 40
   const totalBarWidth = 600
   const barStartX = 380 - totalBarWidth/2
-  
+
   // Fixed bar
-  const fixedBarWidth = totalBarWidth * (fixed / total)
+  const fixedBarWidth = income > 0 ? totalBarWidth * (fixed / income) : 0
   const fixedBar = ns('rect')
   fixedBar.setAttribute('x', barStartX)
   fixedBar.setAttribute('y', barY)
@@ -110,7 +110,7 @@ export function drawFixedVar(state, key) {
   svg.appendChild(fixedBar)
   
   // Variable bar
-  const variableBarWidth = totalBarWidth * (variable / total)
+  const variableBarWidth = income > 0 ? totalBarWidth * (variable / income) : 0
   const variableBar = ns('rect')
   variableBar.setAttribute('x', barStartX + fixedBarWidth)
   variableBar.setAttribute('y', barY)
