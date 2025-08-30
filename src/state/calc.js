@@ -1,4 +1,5 @@
 import { ensureMonth } from './utils.js'
+import { MODEL } from './model.js'
 
 export function monthTotals(state, key){
   ensureMonth(state,key)
@@ -21,5 +22,13 @@ export function monthTotals(state, key){
 }
 export function prevMonthKey(state,key){ const i=state.order.indexOf(key); return i>0 ? state.order[i-1] : null }
 export function real(state,n){ return n/(state.cpi||1) }
-export function sumObj(o){ let t=0; Object.keys(o).forEach(k=>t+=(+o[k]||0)); return t }
-export function rollParents(obj){ let r={}; Object.keys(obj).forEach(p=>r[p]=sumObj(obj[p])); return r }
+export function sumObj(o, model){
+  let t=0
+  Object.keys(model||{}).forEach(k=>t+=(+o[k]||0))
+  return t
+}
+export function rollParents(obj){
+  let r={}
+  Object.keys(MODEL).forEach(p=>r[p]=sumObj(obj[p]||{}, MODEL[p]||{}))
+  return r
+}

@@ -11,7 +11,8 @@ export function renderTable(state, onStateChange){
   const parents = Object.keys(MODEL)
 
   parents.forEach(p=>{
-    const bPar = sumObj(m.budget[p]||{}), aPar=sumObj(m.actual[p]||{})
+    const bPar = sumObj(m.budget[p]||{}, MODEL[p])
+    const aPar = sumObj(m.actual[p]||{}, MODEL[p])
     const trP = document.createElement('tr'); 
     trP.className='parent' + (aPar>bPar? ' over':'')
     
@@ -152,5 +153,9 @@ function numInput(state, key, p, s, kind, val, onStateChange){
   return inp
 }
 
-function sumObj(o){ let t=0; Object.keys(o).forEach(k=>t+=(+o[k]||0)); return t }
+function sumObj(o, model){
+  let t=0
+  Object.keys(model||{}).forEach(k=>t+=(+o[k]||0))
+  return t
+}
 function fmt(n){ return (Math.round(n)).toLocaleString('sv-SE') }
