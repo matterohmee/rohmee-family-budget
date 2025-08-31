@@ -16,6 +16,7 @@ import { drawHeatmap } from './charts/heatmap.js'
 import { drawBridge } from './charts/bridge.js'
 import { drawSpendingTrends } from './charts/spendingTrends.js'
 import { drawMonthlyTrends } from './charts/monthlyTrends.js'
+import { drawMonthlySpendBar } from './charts/monthlySpendBar.js'
 
 // App state (mutable)
 export let state = loadState()
@@ -62,6 +63,13 @@ app.innerHTML = `
       <span><i class="sw" style="background:#3b82f6"></i>Rolling 12-Month: Percentage of Income Spent</span>
     </div>
     <svg id="monthlyTrends" class="chart" viewBox="0 0 1200 400" aria-label="Percentage of Income Spent Over Time"></svg>
+  </div>
+
+  <div class="panel">
+    <div class="legend">
+      <span><i class="sw" style="background:#3b82f6"></i>Rolling 12-Month: Total Spending</span>
+    </div>
+    <svg id="monthlySpendBar" class="chart" viewBox="0 0 1200 400" aria-label="Monthly spending bar chart"></svg>
   </div>
 
   <div class="panel">
@@ -148,30 +156,41 @@ function renderKPIs(st, key){
   kpi.innerHTML = ''
   const mt = monthTotals(st, key)
   const income = st.months[key].income || 0
-  const savings = real(st, income - mt.aTotal + (mt.aSavings || 0))
-  const rate = income>0 ? (income - mt.aTotal + (mt.aSavings || 0))/income : 0
-  const budgetUsed = mt.bTotal>0 ? (mt.aTotal/mt.bTotal) : 0
-  const ytd = st.order.filter(k => k.slice(0,4)===key.slice(0,4) && k<=key)
-  const ytdSav = ytd.map(mk => {
-    const mkTotals = monthTotals(st,mk)
-    return (st.months[mk].income||0) - mkTotals.aTotal + (mkTotals.aSavings || 0)
-  }).reduce((a,b)=>a+b,0)
+  const total = mt.aTotal
+  const budget = mt.bTotal
+  const remaining = Math.max(0, budget - total)
+  const rate = income>0 ? (income - total + (mt.aSavings || 0))/income : 0
+  const top = Object.entries(mt.aParents||{}).sort((a,b)=>b[1]-a[1])[0] || ['—',0]
+  const recent = st.order.slice(-6).map(mk => monthTotals(st,mk).aTotal)
+
   const items=[
-    {lab:'Monthly Savings (real SEK)', val: fmt(savings)},
-    {lab:'Savings Rate', val: (rate*100).toFixed(1)+' %'},
-    {lab:'% of Budget Used', val: (budgetUsed*100).toFixed(0)+' %'},
-    {lab:'YTD Savings', val: fmt(real(st,ytdSav))+' SEK'},
+    {lab:'Total Spend', val: fmt(total), spark: recent},
+    {lab:'Budget Remaining', val: fmt(remaining), progress: budget?total/budget:0},
+    {lab:`Top Category: ${top[0]}`, val: fmt(top[1]), progress: total?top[1]/total:0},
+    {lab:'Savings Rate', val:(rate*100).toFixed(1)+' %', progress: rate}
   ]
+
   items.forEach(it=>{
-    const card = document.createElement('div')
+    const card=document.createElement('div')
     card.className='kpi'
-    card.innerHTML = `<div class="lab">${it.lab}</div><div class="val">${it.val}</div>`
-    card.onclick = () => {
-      state.highlightedCategory = it.lab // Set highlighted category
-      onStateChange() // Trigger full dashboard update
-    }
+    let html=`<div class="lab">${it.lab}</div><div class="val">${it.val}</div>`
+    if(it.spark) html+=sparkline(it.spark)
+    if(it.progress!==undefined) html+=progress(it.progress)
+    card.innerHTML=html
     kpi.appendChild(card)
-  })}
+  })
+}
+
+function sparkline(data){
+  const max=Math.max(...data,1)
+  const pts=data.map((d,i)=>`${(i/(data.length-1))*100},${100-(d/max)*100}`).join(' ')
+  return `<svg class="spark" viewBox="0 0 100 30"><polyline points="${pts}" fill="none" stroke="#3b82f6" stroke-width="2"/></svg>`
+}
+
+function progress(p){
+  const w=Math.max(0,Math.min(1,p))*100
+  return `<div class="mini-bar"><div style="width:${w}%"></div></div>`
+}
 
 function drawAll(){
   const key = document.getElementById('monthSel').value
@@ -181,6 +200,7 @@ function drawAll(){
   drawTotalsBar(state, key)
   drawSpendingTrends(state, key)
   drawMonthlyTrends(state, key);
+  drawMonthlySpendBar(state, key);
   drawShareBars(state, key);
   drawBAvsParents(state, key);
   drawSavingsBars(state, key);

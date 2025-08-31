@@ -2,6 +2,10 @@
 
 Modular, zero-dependency (vanilla JS + SVG) dashboard. Built with **Vite** for fast dev/hot reload and optimized builds.
 
+## Features
+- Rolling 12-month bar chart visualizing total monthly spending
+- KPI strip with total spend, budget remaining, top category, and savings rate, each with mini visualizations
+
 ## Quick start (no terminal optional)
 - Upload this folder to a new GitHub repo: `rohmee-family-budget`
 - Connect the repo to **Netlify**
