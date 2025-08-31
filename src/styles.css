@@ -237,6 +237,26 @@ h4 { font-size: 1.25rem; } /* Increased from 1.125rem */
   font-family: var(--font-mono);
 }
 
+.kpi svg.spark {
+  width: 100%;
+  height: 30px;
+  margin-top: 8px;
+}
+
+.kpi .mini-bar {
+  width: 100%;
+  height: 4px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.kpi .mini-bar div {
+  height: 100%;
+  background: var(--accent-primary);
+}
+
 /* Controls Area */
 .controlsArea {
   display: grid;
